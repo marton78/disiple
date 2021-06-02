@@ -1,0 +1,74 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[a4paper, total={5in, 10in}]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+\newtheorem*{theorem}{Theorem}
+\newtheorem*{example}{Example}
+
+\setlength{\parindent}{0em}
+\pagenumbering{gobble}
+
+\title{FIR Filtering with Polynomial Coefficients}
+\author{Márton Danóczy}
+\date{January 2014}
+
+\begin{document}
+
+\maketitle
+
+\begin{definition}
+A filter shall be called \emph{polynomial filter} if all of its coefficients can be expressed as a polynomial.
+
+\[ w_i = \sum_p a_p i^p \]
+
+An example of such a filter would be the Welch window function, a quadratic polynomial which reaches unity in the middle of the window and zero at the samples just outside the span of the window.
+
+\end{definition}
+
+\begin{theorem}
+Convolution with polynomial filters can be computed recursively.
+\end{theorem}
+
+\begin{proof}
+We begin by defining $z_{p,t}$ as the convolution of the vector $(1, 2^p, \dots, n^p)^\top$ with the signal $x$:
+
+\begin{align*}
+(w*x)[t] &= \sum_{i=1}^n w_i x_{t-(i-1)}
+    = \sum_{i=1}^n \sum_p a_p i^p x_{t-(i-1)} \\
+    &= \sum_p a_p \sum_{i=1}^n i^p x_{t-(i-1)}
+    = \sum_p a_p z_{p,t}
+\end{align*}
+
+Now, by shifting indices we arrive at the recurrence relation:
+
+\begin{align*}
+z_{p,t} &\equiv \sum_{i=1}^n i^p x_{t-(i-1)} = \sum_{i=0}^{n-1} (i+1)^p x_{t-i} = \sum_{i=0}^{n-1} \sum_{k=0}^{p} \binom{p}{k} i^k x_{t-i} \\
+ &= \sum_{k=0}^{p} \binom{p}{k} \left[ \sum_{i=0}^{n-1} i^k x_{t-i} \right]
+ = \sum_{k=0}^{p} \binom{p}{k} \left[ \sum_{i=1}^{n} i^k x_{t-i} - n^k x_{t-n} + 0^k x_t\right] \\
+ &= \sum_{k=0}^{p} \binom{p}{k} \left[ z_{k,t-1} - n^k x_{t-n} + 0^k x_t\right] \\
+ &= z_{p,t-1} - n^p x_{t-n} + \sum_{k=0}^{p-1} \binom{p-1}{k} \left[ z_{k,t-1} - n^k x_{t-n} + 0^k x_t\right] \\
+ &= z_{p,t-1} - n^p x_{t-n} + z_{p-1,t} \quad\mathrm{if}\quad p \geq 1
+\end{align*}
+
+\end{proof}
+
+\begin{example}
+For a quadratic polynomial filter, the recurrence is computed as follows:
+
+\begin{align*}
+z_{0,t} &= z_{0,t-1} - x_{t-n} + x_t \\
+z_{1,t} &= z_{1,t-1} - n x_{t-n} + z_{0,t} \\
+z_{2,t} &= z_{2,t-1} - n^2 x_{t-n} + z_{1,t}
+\end{align*}
+
+Note that due to the lack of divisions this recurrence can be used to implement polynomial filtering in the domain of integers.
+
+\end{example}
+
+\end{document}

@@ -1,0 +1,8 @@
+[requires]
+eigen/3.3.9
+
+[build_requires]
+catch2/2.13.6
+
+[generators]
+cmake
