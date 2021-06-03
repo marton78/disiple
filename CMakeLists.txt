@@ -24,6 +24,7 @@ set(TEST_SOURCES
     test/fir.cpp
     test/next_pow2.cpp
     test/running_stats.cpp
+    test/delay.cpp
 )
 
 add_library (disiple ${LIB_SOURCES})
