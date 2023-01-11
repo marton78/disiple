@@ -14,15 +14,15 @@ namespace {
 }
 
 TEMPLATE_TEST_CASE_SIG("Moving Average Filter", "[running_stats]",
-    ((typename Scalar, int Dim), Scalar, Dim), 
+    ((typename Scalar, int NChan), Scalar, NChan), 
     (float, Dynamic), (double, Dynamic), (int, Dynamic),
     (float, nchan),   (double, nchan),   (int, nchan) 
 ) {
     const int W = 10; // Window length of the filter
 
-    disiple::MovingAverage<Array<Scalar, Dim, 1>, Dynamic, 1> rmean1(W);
-    disiple::MovingAverage<Array<Scalar, Dim, 1>, Dynamic, 2> rmean2(W);
-    disiple::MovingAverage<Array<Scalar, Dim, 1>, Dynamic, 3> rmean3(W);
+    disiple::MovingAverage<Scalar, Dynamic, 1, NChan> rmean1(W);
+    disiple::MovingAverage<Scalar, Dynamic, 2, NChan> rmean2(W);
+    disiple::MovingAverage<Scalar, Dynamic, 3, NChan> rmean3(W);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
     Array<Scalar, nchan, 1> y1, y2, y3, z;

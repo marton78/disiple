@@ -7,17 +7,15 @@
 namespace disiple {
 
     /// Finite impulse response (FIR) digital filter
-    template <typename Element, int Length = Eigen::Dynamic>
-    struct FIR : public FilterBase<Element,
-            FIRState<typename ElementTraits<Element>::Scalar, Length, ElementTraits<Element>::Channels>,
-            FIRCoeffs<typename ElementTraits<Element>::Scalar, Length>
+    template <typename Scalar, int Length = Eigen::Dynamic, int Channels = 1>
+    struct FIR : public FilterBase<Scalar, Channels,
+            FIRState<Scalar, Length, Channels>,
+            FIRCoeffs<Scalar, Length>
         >
     {
-        enum { Channels = ElementTraits<Element>::Channels };
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using State  = FIRState<Scalar, Length, Channels>;
         using Coeffs = FIRCoeffs<Scalar, Length>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         FIR() {}
 

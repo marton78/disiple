@@ -6,18 +6,14 @@ namespace disiple {
 
     enum DryRun { dry_run };
 
-    template <typename Element,
-              typename State, typename Coeffs,
-              typename Enable = void>
-    class FilterBase;
-
-    template <typename Derived, typename State, typename Coeffs>
-    class FilterBase<Derived, State, Coeffs,
-                        typename std::enable_if<
-                            !std::is_arithmetic<Derived>::value
-                        >::type>
+    template <typename Scalar, int Channels,
+              typename State, typename Coeffs>
+    class FilterBase
     {
+        static_assert(std::is_arithmetic<Scalar>::value,
+                      "Scalar must be an arithmetic value");
         template <typename> class have_dry_run_apply;
+        using Map1 = Eigen::Map<Eigen::Array<Scalar, 1, 1>>;
 
     protected:
         template <typename... Args>
@@ -95,11 +91,33 @@ namespace disiple {
             }
         }
 
-    private:
-        enum { Channels = Eigen::internal::traits<Derived>::RowsAtCompileTime };
-        static_assert(Eigen::internal::traits<Derived>::ColsAtCompileTime == 1,
-                      "This class is for vectors only");
+        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
+        Scalar operator()(Scalar x, Enable* = 0)
+        {
+            Scalar y;
+            apply(Map1(&x), Map1(&y));
+            return y;
+        }
 
+        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
+        void apply(Scalar x, Enable* = 0)
+        {
+            apply(Map1(&x));
+        }
+
+        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
+        void apply(Scalar x, Scalar& y, Enable* = 0)
+        {
+            apply(Map1(&x), Map1(&y));
+        }
+
+        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
+        void apply(Scalar x, DryRun, Enable* = 0)
+        {
+            apply(Map1(&x), dry_run);
+        }
+
+    private:
         template <typename A>
         class have_dry_run_apply
         {
@@ -128,83 +146,7 @@ namespace disiple {
 
         State  state_;
         Coeffs coeffs_;
-        Eigen::Array<typename Derived::Scalar, Channels, 1> backup_;
+        Eigen::Array<Scalar, Channels, 1> backup_;
     };
-
-
-
-
-    template <typename Scalar, typename State, typename Coeffs>
-    class FilterBase<Scalar, State, Coeffs,
-        typename std::enable_if<
-            std::is_arithmetic<Scalar>::value
-        >::type>
-        : public FilterBase<Eigen::Array<Scalar, 1, 1>, State, Coeffs>
-    {
-        using Array = Eigen::Array<Scalar, 1, 1>;
-        using Map   = Eigen::Map<Array>;
-        using Base  = FilterBase<Array, State, Coeffs>;
-
-    protected:
-        template <typename... Args>
-        explicit FilterBase(Args&&... args) : Base(std::forward<Args>(args)...) {}
-
-        using Base::state;
-        using Base::coeffs;
-
-    public:
-        using Base::initialize;
-
-        Scalar operator()(Scalar x)
-        {
-            Scalar y;
-            Base::apply(Map(&x), Map(&y));
-            return y;
-        }
-
-        void apply(Scalar x)
-        {
-            Base::apply(Map(&x));
-        }
-
-        void apply(Scalar x, Scalar& y)
-        {
-            Base::apply(Map(&x), Map(&y));
-        }
-
-        void apply(Scalar x, DryRun)
-        {
-            Base::apply(Map(&x), dry_run);
-        }
-    };
-
-
-
-
-
-
-    template <typename Element, typename Enable = void>
-    struct ElementTraits;
-
-    template <typename T>
-    struct ElementTraits<T, typename std::enable_if<
-                !std::is_arithmetic<T>::value
-            >::type>
-    {
-        static_assert(Eigen::internal::traits<T>::ColsAtCompileTime == 1,
-                      "This class is for vectors only");
-        enum { Channels = Eigen::internal::traits<T>::RowsAtCompileTime };
-        using Scalar = typename T::Scalar;
-    };
-
-    template <typename T>
-    struct ElementTraits<T, typename std::enable_if<
-                std::is_arithmetic<T>::value
-            >::type>
-    {
-        enum { Channels = 1 };
-        using Scalar = T;
-    };
-
 
 }

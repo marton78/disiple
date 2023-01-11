@@ -8,17 +8,15 @@
 namespace disiple {
 
     /// Infinite impulse response (IIR) digital filter
-    template <typename Element, int Stages = Eigen::Dynamic, IIRImplementation Type = DF2T>
-    struct IIR : public FilterBase<Element,
-            IIRImpl<typename ElementTraits<Element>::Scalar, Stages, ElementTraits<Element>::Channels, Type>,
-            SecondOrderSections<typename ElementTraits<Element>::Scalar, Stages>
+    template <typename Scalar, int Stages = Eigen::Dynamic, IIRImplementation Type = DF2T, int Channels = 1>
+    struct IIR : public FilterBase<Scalar, Channels,
+            IIRImpl<Scalar, Stages, Channels, Type>,
+            SecondOrderSections<Scalar, Stages>
         >
     {
-        enum { Channels = ElementTraits<Element>::Channels };
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using State  = IIRImpl<Scalar, Stages, Channels, Type>;
         using Coeffs = SecondOrderSections<Scalar, Stages>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         IIR() {}
         IIR(const IIRDesign &d) : Base(d) {}

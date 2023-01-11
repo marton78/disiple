@@ -120,7 +120,7 @@ TEMPLATE_TEST_CASE_SIG("FIR Filter with predefined parameters", "[fir]",
 ) {
     const TestFixtureFIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = FIR<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 5>;
+    using Filter = FIR<Scalar, DynOrder ? Dynamic : 5, NChan>;
 
     SECTION("in_place", "FIR filter applied in place") {
         Filter f(fix.fir_params);
@@ -165,7 +165,7 @@ TEMPLATE_TEST_CASE_SIG("FIR filter with designed with an asymmetric Blackman win
 ) {
     const TestFixtureFIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = FIR<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 25>;
+    using Filter = FIR<Scalar, DynOrder ? Dynamic : 25, NChan>;
 
     FIRWindow window = blackman(9, 15);
     FIRDesign designs[4] = {

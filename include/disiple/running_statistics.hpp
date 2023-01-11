@@ -11,44 +11,41 @@ namespace disiple {
     /// More than Three Comparisons per Element”,
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
-    template <typename Element>
-    struct RunningMin : public FilterBase<Element,
-        RunningMinMaxState<Element, std::less>,
-        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
+    template <typename Scalar, int Channels = 1>
+    struct RunningMin : public FilterBase<Scalar, Channels,
+        RunningMinMaxState<Scalar, Channels, std::less>,
+        RunningMinMaxCoeffs<Scalar>
     >
     {
-        using Scalar = typename ElementTraits<Element>::Scalar;
-        using State  = RunningMinMaxState<Element, std::less>;
+        using State  = RunningMinMaxState<Scalar, Channels, std::less>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         explicit RunningMin(int len) : Base(len) {}
     };
 
-    template <typename Element>
-    struct RunningMax : public FilterBase<Element,
-        RunningMinMaxState<Element, std::greater>,
-        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
+    template <typename Scalar, int Channels = 1>
+    struct RunningMax : public FilterBase<Scalar, Channels,
+        RunningMinMaxState<Scalar, Channels, std::greater>,
+        RunningMinMaxCoeffs<Scalar>
     >
     {
-        using Scalar      = typename ElementTraits<Element>::Scalar;
-        using State  = RunningMinMaxState<Element, std::greater>;
+        using State  = RunningMinMaxState<Scalar, Channels, std::greater>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         explicit RunningMax(int len) : Base(len) {}
     };
 
-    template <typename Element>
-    struct RunningRange : public FilterBase<Element,
-        RunningRangeState<Element>,
-        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
+    template <typename Scalar, int Channels = 1>
+    struct RunningRange : public FilterBase<Scalar, Channels,
+        RunningRangeState<Scalar, Channels>,
+        RunningMinMaxCoeffs<Scalar>
     >
     {
-        using Scalar      = typename ElementTraits<Element>::Scalar;
-        using State  = RunningRangeState<Element>;
+        using State  = RunningRangeState<Scalar, Channels>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         explicit RunningRange(int len) : Base(len) {}
     };

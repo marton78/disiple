@@ -17,18 +17,17 @@ namespace {
 }
 
 TEMPLATE_TEST_CASE_SIG("Running Bandpass Root Mean Square", "[running_stats]",
-    ((typename Scalar, int Dim), Scalar, Dim), 
+    ((typename Scalar, int NChan), Scalar, NChan), 
     (float, Dynamic), (double, Dynamic),
     (float, nchan),   (double, nchan)
 ) {
-    using Element     = Array<Scalar, Dim, 1>;
-    using BPFilter    = IIR<Element, 4>;
-    using Expectation = MovingAverage<Element>;
+    using BPFilter    = IIR<Scalar, 4, DF2T, NChan>;
+    using Expectation = MovingAverage<Scalar, Eigen::Dynamic, 1, NChan>;
 
     IIRDesign bandpass_design(butterworth(4), Bandpass(.1, .2));
     int expectation_design = 10;
 
-    BandRMS<Element, BPFilter, Expectation> brms(bandpass_design, expectation_design);
+    BandRMS<Scalar, BPFilter, Expectation, NChan> brms(bandpass_design, expectation_design);
 
     BPFilter     bp(bandpass_design);
     Expectation  ex(expectation_design);

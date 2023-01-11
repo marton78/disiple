@@ -12,17 +12,15 @@ namespace disiple {
     /// where the $a_i$ are rational functions of the window length T:
     ///     $$ a_i = \sum_j p_ij n^j / \sum_k q_ik n^k $$
     /// with $t \in [1, T]$, $i \in [0, I)$, $j \in [0, J)$ and $k \in [0, K)$.
-    template <typename Element, int I, int J, int K, int Length = Eigen::Dynamic>
-    struct PolynomialFIR : public FilterBase<Element,
-        PolyFIRState<typename ElementTraits<Element>::Scalar, Length, ElementTraits<Element>::Channels, I>,
-        PolyFIRCoeffs<typename ElementTraits<Element>::Scalar, Length, I, J, K>
+    template <typename Scalar, int I, int J, int K, int Length = Eigen::Dynamic, int Channels = 1>
+    struct PolynomialFIR : public FilterBase<Scalar, Channels,
+        PolyFIRState<Scalar, Length, Channels, I>,
+        PolyFIRCoeffs<Scalar, Length, I, J, K>
     >
     {
-        enum { Channels = ElementTraits<Element>::Channels };
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using State  = PolyFIRState<Scalar, Length, Channels, I>;
         using Coeffs = PolyFIRCoeffs<Scalar, Length, I, J, K>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         PolynomialFIR() {}
 

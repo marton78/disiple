@@ -16,15 +16,15 @@ namespace {
 }
 
 TEMPLATE_TEST_CASE_SIG("Running Min, Max and Range", "[running_stats]",
-    ((typename Scalar, int Dim), Scalar, Dim), 
+    ((typename Scalar, int NChan), Scalar, NChan), 
     (float, Dynamic), (double, Dynamic), (int, Dynamic),
     (float, nchan),   (double, nchan),   (int, nchan) 
 ) {
     const int W = 10; // Window length of the filter
 
-    disiple::RunningMin  <Array<Scalar, Dim, 1>> fmin(W);
-    disiple::RunningMax  <Array<Scalar, Dim, 1>> fmax(W);
-    disiple::RunningRange<Array<Scalar, Dim, 1>> frng(W);
+    disiple::RunningMin  <Scalar, NChan> fmin(W);
+    disiple::RunningMax  <Scalar, NChan> fmax(W);
+    disiple::RunningRange<Scalar, NChan> frng(W);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
     Array<Scalar, nchan, 1> ymin, ymax, yrng, zmin, zmax, zrng;

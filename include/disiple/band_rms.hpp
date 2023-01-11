@@ -6,7 +6,6 @@ namespace disiple {
 
     template <typename, typename, typename> struct BandRMSCoeffs;
     template <typename, typename, typename> struct BandRMSState;
-    template <typename, typename, typename> struct BandRMS_algo;
 
     /// A filter that calculates the root mean square of a signal
     /// in a given band. The result is corrected via mutliplying
@@ -14,17 +13,15 @@ namespace disiple {
     /// e.g. BandRMS<Array4f, iir<Array4f, 4>, moving_average<Array4f> >
     /// See: http://en.wikipedia.org/wiki/Root_mean_square#RMS_of_common_waveforms
 
-    template <typename Element, typename Bandpass, typename Expectation>
-    struct BandRMS : public FilterBase<Element,
-        BandRMSState <typename ElementTraits<Element>::Scalar, Bandpass, Expectation>,
-        BandRMSCoeffs<typename ElementTraits<Element>::Scalar, Bandpass, Expectation>
+    template <typename Scalar, typename Bandpass, typename Expectation, int Channels = 1>
+    struct BandRMS : public FilterBase<Scalar, Channels,
+        BandRMSState <Scalar, Bandpass, Expectation>,
+        BandRMSCoeffs<Scalar, Bandpass, Expectation>
     >
     {
-        enum { Channels = ElementTraits<Element>::Channels };
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using State  = BandRMSState <Scalar, Bandpass, Expectation>;
         using Coeffs = BandRMSCoeffs<Scalar, Bandpass, Expectation>;
-        using Base   = FilterBase<Element, State, Coeffs>;
+        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         BandRMS() {}
 

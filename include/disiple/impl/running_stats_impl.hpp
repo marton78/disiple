@@ -24,11 +24,9 @@ namespace disiple {
         int len_;
     };
 
-    template <typename Element, template<typename> class Compare>
+    template <typename Scalar, int Channels, template<typename> class Compare>
     struct RunningMinMaxState
     {
-        enum { Channels = ElementTraits<Element>::Channels };
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
         RunningMinMaxState()
@@ -104,10 +102,9 @@ namespace disiple {
     };
 
 
-    template <typename Element>
+    template <typename Scalar, int Channels>
     struct RunningRangeState
     {
-        using Scalar = typename ElementTraits<Element>::Scalar;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
         void setup(const Coeffs& coeffs, int nchans)
@@ -139,8 +136,8 @@ namespace disiple {
             smax.apply(coeffs, xi, dry_run);
         }
 
-        RunningMinMaxState<Element, std::less>    smin;
-        RunningMinMaxState<Element, std::greater> smax;
+        RunningMinMaxState<Scalar, Channels, std::less>    smin;
+        RunningMinMaxState<Scalar, Channels, std::greater> smax;
     };
 
 }
