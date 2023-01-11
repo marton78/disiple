@@ -132,8 +132,6 @@ namespace disiple {
         using Base::pos_;
         Eigen::Array<Scalar, Channels, Stages> sum_, correct_sum_;
         int num_, correct_num_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 
@@ -186,8 +184,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>      avg_;
         int num_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }

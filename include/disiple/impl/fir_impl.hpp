@@ -81,8 +81,6 @@ namespace disiple {
 
         Eigen::Matrix<Scalar, Channels, Length> buf_;
         int pos_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }

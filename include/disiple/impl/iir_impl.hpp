@@ -83,8 +83,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>   x0_;
         Eigen::Array<Scalar, Channels, S4>  history_; // x1 x2 y1 y2
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 
@@ -148,8 +146,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>      w0_;
         Eigen::Array<Scalar, Channels, Stages> w1_, w2_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 
@@ -221,8 +217,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>      x0_;
         Eigen::Array<Scalar, Channels, Stages> d1_, d2_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }

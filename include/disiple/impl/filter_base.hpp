@@ -129,8 +129,6 @@ namespace disiple {
         State  state_;
         Coeffs coeffs_;
         Eigen::Array<typename Derived::Scalar, Channels, 1> backup_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 

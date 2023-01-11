@@ -39,8 +39,6 @@ namespace disiple {
     protected:
         Coeffs  coeffs_;
         Scalar    scaling_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     struct wrong_static_size : std::runtime_error

@@ -47,8 +47,6 @@ namespace disiple {
 
         typename Bandpass::Coeffs    bpc_;
         typename Expectation::Coeffs exc_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     template <typename Scalar, typename Bandpass, typename Expectation>
@@ -88,8 +86,6 @@ namespace disiple {
 
         typename Bandpass::State    bps_;
         typename Expectation::State exs_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }

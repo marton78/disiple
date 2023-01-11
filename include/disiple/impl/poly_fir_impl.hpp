@@ -105,8 +105,6 @@ namespace disiple {
         Eigen::Array<Scalar, Channels, Stages>      sum_;
         Eigen::Array<Scalar, Stages, 1>             a_;
         int                                         num_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }
