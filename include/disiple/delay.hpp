@@ -6,19 +6,19 @@
 namespace disiple {
 
     template <typename Element, int Length = Eigen::Dynamic>
-    struct delay : public filter_base<Element,
-        delay_state<typename element_traits<Element>::Scalar, Length, element_traits<Element>::Channels>,
-        delay_coeffs<typename element_traits<Element>::Scalar, Length>
+    struct Delay : public FilterBase<Element,
+        DelayState<typename ElementTraits<Element>::Scalar, Length, ElementTraits<Element>::Channels>,
+        DelayCoeffs<typename ElementTraits<Element>::Scalar, Length>
     >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        using Scalar = typename element_traits<Element>::Scalar;
-        using State  = delay_state<Scalar, Length, Channels>;
-        using Coeffs = delay_coeffs<Scalar, Length>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        enum { Channels = ElementTraits<Element>::Channels };
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using State  = DelayState<Scalar, Length, Channels>;
+        using Coeffs = DelayCoeffs<Scalar, Length>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        delay() {}
-        explicit delay(int length) : Base(length) {}
+        Delay() {}
+        explicit Delay(int length) : Base(length) {}
     };
 
 }

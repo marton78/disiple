@@ -9,10 +9,10 @@ namespace disiple {
     template <typename Element,
               typename State, typename Coeffs,
               typename Enable = void>
-    class filter_base;
+    class FilterBase;
 
     template <typename Derived, typename State, typename Coeffs>
-    class filter_base<Derived, State, Coeffs,
+    class FilterBase<Derived, State, Coeffs,
                         typename std::enable_if<
                             !std::is_arithmetic<Derived>::value
                         >::type>
@@ -21,7 +21,7 @@ namespace disiple {
 
     protected:
         template <typename... Args>
-        explicit filter_base(Args&&... args) : coeffs_(std::forward<Args>(args)...) {}
+        explicit FilterBase(Args&&... args) : coeffs_(std::forward<Args>(args)...) {}
 
         State& state() { return state_; }
         const State& state() const { return state_; }
@@ -137,11 +137,11 @@ namespace disiple {
 
 
     template <typename Scalar, typename State, typename Coeffs>
-    class filter_base<Scalar, State, Coeffs,
+    class FilterBase<Scalar, State, Coeffs,
         typename std::enable_if<
             std::is_arithmetic<Scalar>::value
         >::type>
-        : public filter_base<Eigen::Array<Scalar, 1, 1>, State, Coeffs>
+        : public FilterBase<Eigen::Array<Scalar, 1, 1>, State, Coeffs>
     {
         using Array = Eigen::Array<Scalar, 1, 1>;
         using Map   = Eigen::Map<Array>;
@@ -149,7 +149,7 @@ namespace disiple {
 
     protected:
         template <typename... Args>
-        explicit filter_base(Args&&... args) : Base(std::forward<Args>(args)...) {}
+        explicit FilterBase(Args&&... args) : Base(std::forward<Args>(args)...) {}
 
         using Base::state;
         using Base::coeffs;
@@ -186,10 +186,10 @@ namespace disiple {
 
 
     template <typename Element, typename Enable = void>
-    struct element_traits;
+    struct ElementTraits;
 
     template <typename T>
-    struct element_traits<T, typename std::enable_if<
+    struct ElementTraits<T, typename std::enable_if<
                 !std::is_arithmetic<T>::value
             >::type>
     {
@@ -200,7 +200,7 @@ namespace disiple {
     };
 
     template <typename T>
-    struct element_traits<T, typename std::enable_if<
+    struct ElementTraits<T, typename std::enable_if<
                 std::is_arithmetic<T>::value
             >::type>
     {

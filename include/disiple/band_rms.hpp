@@ -4,43 +4,43 @@
 
 namespace disiple {
 
-    template <typename, typename, typename> struct band_rms_coeffs;
-    template <typename, typename, typename> struct band_rms_state;
-    template <typename, typename, typename> struct band_rms_algo;
+    template <typename, typename, typename> struct BandRMSCoeffs;
+    template <typename, typename, typename> struct BandRMSState;
+    template <typename, typename, typename> struct BandRMS_algo;
 
     /// A filter that calculates the root mean square of a signal
     /// in a given band. The result is corrected via mutliplying
     /// it by sqrt(2) thus giving correct results for sine waves
-    /// e.g. band_rms<Array4f, iir<Array4f, 4>, moving_average<Array4f> >
+    /// e.g. BandRMS<Array4f, iir<Array4f, 4>, moving_average<Array4f> >
     /// See: http://en.wikipedia.org/wiki/Root_mean_square#RMS_of_common_waveforms
 
     template <typename Element, typename Bandpass, typename Expectation>
-    struct band_rms : public filter_base<Element,
-        band_rms_state <typename element_traits<Element>::Scalar, Bandpass, Expectation>,
-        band_rms_coeffs<typename element_traits<Element>::Scalar, Bandpass, Expectation>
+    struct BandRMS : public FilterBase<Element,
+        BandRMSState <typename ElementTraits<Element>::Scalar, Bandpass, Expectation>,
+        BandRMSCoeffs<typename ElementTraits<Element>::Scalar, Bandpass, Expectation>
     >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        using Scalar = typename element_traits<Element>::Scalar;
-        using State  = band_rms_state <Scalar, Bandpass, Expectation>;
-        using Coeffs = band_rms_coeffs<Scalar, Bandpass, Expectation>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        enum { Channels = ElementTraits<Element>::Channels };
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using State  = BandRMSState <Scalar, Bandpass, Expectation>;
+        using Coeffs = BandRMSCoeffs<Scalar, Bandpass, Expectation>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        band_rms() {}
+        BandRMS() {}
 
         template <typename TB, typename TE>
-        band_rms(TB&& b, TE&& e) : Base(std::forward<TB>(b), std::forward<TE>(e))
+        BandRMS(TB&& b, TE&& e) : Base(std::forward<TB>(b), std::forward<TE>(e))
         {}
     };
 
 
     template <typename Scalar, typename Bandpass, typename Expectation>
-    struct band_rms_coeffs
+    struct BandRMSCoeffs
     {
-        band_rms_coeffs() {}
+        BandRMSCoeffs() {}
 
         template <typename TB, typename TE>
-        explicit band_rms_coeffs(TB&& b, TE&& e)
+        explicit BandRMSCoeffs(TB&& b, TE&& e)
         : bpc_(std::forward<TB>(b)), exc_(std::forward<TE>(e)) {}
 
         Scalar scaling() { return bpc_.scaling() * exc_.scaling(); }
@@ -52,9 +52,9 @@ namespace disiple {
     };
 
     template <typename Scalar, typename Bandpass, typename Expectation>
-    struct band_rms_state
+    struct BandRMSState
     {
-        using Coeffs = band_rms_coeffs<Scalar, Bandpass, Expectation>;
+        using Coeffs = BandRMSCoeffs<Scalar, Bandpass, Expectation>;
 
         void setup(const Coeffs& coeffs, int nchans)
         {
@@ -76,7 +76,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const band_rms_coeffs<Scalar, Bandpass, Expectation>& coeffs,
+        void apply(const BandRMSCoeffs<Scalar, Bandpass, Expectation>& coeffs,
                    Eigen::ArrayBase<X>& xi)
         {
             bps_.apply(coeffs.bpc_, xi);

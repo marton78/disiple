@@ -8,14 +8,14 @@ namespace disiple {
     // polynomial fir filter
 
     template <typename Scalar, int Length, int Stages, int J, int K>
-    struct poly_fir_coeffs : mavg_coeffs<Scalar, Length, Stages>
+    struct PolyFIRCoeffs : MAvgCoeffs<Scalar, Length, Stages>
     {
-        using Base = mavg_coeffs<Scalar, Length, Stages>;
+        using Base = MAvgCoeffs<Scalar, Length, Stages>;
 
-        poly_fir_coeffs() {}
+        PolyFIRCoeffs() {}
 
         template <typename P, typename Q>
-        explicit poly_fir_coeffs(const Eigen::ArrayBase<P>& p, const Eigen::ArrayBase<Q>& q, int wlen) :
+        explicit PolyFIRCoeffs(const Eigen::ArrayBase<P>& p, const Eigen::ArrayBase<Q>& q, int wlen) :
             Base(wlen, p.rows()), p_(p), q_(q)
         {}
 
@@ -37,18 +37,18 @@ namespace disiple {
     };
 
     template <typename Scalar, int Length, int Channels, int Stages>
-    struct poly_fir_state : fir_state<Scalar, Length, Channels>
+    struct PolyFIRState : FIRState<Scalar, Length, Channels>
     {
-        using Base = fir_state<Scalar, Length, Channels>;
+        using Base = FIRState<Scalar, Length, Channels>;
 
-        poly_fir_state() : num_(0)
+        PolyFIRState() : num_(0)
         {
             if (Length != Eigen::Dynamic && Channels != Eigen::Dynamic)
                 initialize();
         }
 
         template <int J, int K>
-        void setup(const poly_fir_coeffs<Scalar, Length, Stages, J, K>& coeffs, int nchans)
+        void setup(const PolyFIRCoeffs<Scalar, Length, Stages, J, K>& coeffs, int nchans)
         {
             const int len = coeffs.length();
             if (Base::num_chans() != nchans ||
@@ -68,7 +68,7 @@ namespace disiple {
         }
 
         template <int J, int K, typename X>
-        void apply(const poly_fir_coeffs<Scalar, Length, Stages, J, K>& coeffs,
+        void apply(const PolyFIRCoeffs<Scalar, Length, Stages, J, K>& coeffs,
                    Eigen::ArrayBase<X>& xi)
         {
             advance();

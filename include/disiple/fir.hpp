@@ -8,23 +8,23 @@ namespace disiple {
 
     /// Finite impulse response (FIR) digital filter
     template <typename Element, int Length = Eigen::Dynamic>
-    struct fir : public filter_base<Element,
-            fir_state<typename element_traits<Element>::Scalar, Length, element_traits<Element>::Channels>,
-            fir_coeffs<typename element_traits<Element>::Scalar, Length>
+    struct FIR : public FilterBase<Element,
+            FIRState<typename ElementTraits<Element>::Scalar, Length, ElementTraits<Element>::Channels>,
+            FIRCoeffs<typename ElementTraits<Element>::Scalar, Length>
         >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        using Scalar = typename element_traits<Element>::Scalar;
-        using State  = fir_state<Scalar, Length, Channels>;
-        using Coeffs = fir_coeffs<Scalar, Length>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        enum { Channels = ElementTraits<Element>::Channels };
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using State  = FIRState<Scalar, Length, Channels>;
+        using Coeffs = FIRCoeffs<Scalar, Length>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        fir() {}
+        FIR() {}
 
-        fir(fir_design d) : Base(std::move(d)) {}
+        FIR(FIRDesign d) : Base(std::move(d)) {}
 
         template <typename A>
-        fir(const Eigen::ArrayBase<A>& a) : Base(a) {}
+        FIR(const Eigen::ArrayBase<A>& a) : Base(a) {}
 
         int length() const { return Base::coeffs().length(); }
         using Base::coeffs;

@@ -12,45 +12,45 @@ namespace disiple {
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
     template <typename Element>
-    struct running_min : public filter_base<Element,
-        running_minmax_state<Element, std::less>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
+    struct RunningMin : public FilterBase<Element,
+        RunningMinMaxState<Element, std::less>,
+        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
     >
     {
-        using Scalar = typename element_traits<Element>::Scalar;
-        using State  = running_minmax_state<Element, std::less>;
-        using Coeffs = running_minmax_coeffs<Scalar>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using State  = RunningMinMaxState<Element, std::less>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        explicit running_min(int len) : Base(len) {}
+        explicit RunningMin(int len) : Base(len) {}
     };
 
     template <typename Element>
-    struct running_max : public filter_base<Element,
-        running_minmax_state<Element, std::greater>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
+    struct RunningMax : public FilterBase<Element,
+        RunningMinMaxState<Element, std::greater>,
+        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
     >
     {
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using State  = running_minmax_state<Element, std::greater>;
-        using Coeffs = running_minmax_coeffs<Scalar>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        using Scalar      = typename ElementTraits<Element>::Scalar;
+        using State  = RunningMinMaxState<Element, std::greater>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        explicit running_max(int len) : Base(len) {}
+        explicit RunningMax(int len) : Base(len) {}
     };
 
     template <typename Element>
-    struct running_range : public filter_base<Element,
-        running_range_state<Element>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
+    struct RunningRange : public FilterBase<Element,
+        RunningRangeState<Element>,
+        RunningMinMaxCoeffs<typename ElementTraits<Element>::Scalar>
     >
     {
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using State  = running_range_state<Element>;
-        using Coeffs = running_minmax_coeffs<Scalar>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        using Scalar      = typename ElementTraits<Element>::Scalar;
+        using State  = RunningRangeState<Element>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        explicit running_range(int len) : Base(len) {}
+        explicit RunningRange(int len) : Base(len) {}
     };
 
 }

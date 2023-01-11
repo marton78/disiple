@@ -6,9 +6,9 @@
 namespace disiple {
 
     template <typename Scalar, int Length, int Stages>
-    struct mavg_coeffs
+    struct MAvgCoeffs
     {
-        explicit mavg_coeffs(int n = Length, int s = Stages)
+        explicit MAvgCoeffs(int n = Length, int s = Stages)
         { assert(n == Length && s == Stages); }
 
         static int    length()  { return Length; }
@@ -16,9 +16,9 @@ namespace disiple {
     };
 
     template <typename Scalar, int Stages>
-    struct mavg_coeffs<Scalar, Eigen::Dynamic, Stages>
+    struct MAvgCoeffs<Scalar, Eigen::Dynamic, Stages>
     {
-        explicit mavg_coeffs(int n = 0, int s = Stages)
+        explicit MAvgCoeffs(int n = 0, int s = Stages)
         : length_(n) { assert(s == Stages); }
 
         int           length()  const { return length_; }
@@ -28,9 +28,9 @@ namespace disiple {
     };
 
     template <typename Scalar, int Length>
-    struct mavg_coeffs<Scalar, Length, Eigen::Dynamic>
+    struct MAvgCoeffs<Scalar, Length, Eigen::Dynamic>
     {
-        explicit mavg_coeffs(int n = Length, int s = 0)
+        explicit MAvgCoeffs(int n = Length, int s = 0)
         : stages_(s) { assert(n == Length); }
 
         static int    length()        { return Length; }
@@ -40,9 +40,9 @@ namespace disiple {
     };
 
     template <typename Scalar>
-    struct mavg_coeffs<Scalar, Eigen::Dynamic, Eigen::Dynamic>
+    struct MAvgCoeffs<Scalar, Eigen::Dynamic, Eigen::Dynamic>
     {
-        explicit mavg_coeffs(int n = 0, int s = 0)
+        explicit MAvgCoeffs(int n = 0, int s = 0)
         : length_(n), stages_(s) {}
 
         int           length()  const { return length_; }
@@ -58,19 +58,19 @@ namespace disiple {
     };
 
     template <typename Scalar, int Length, int Channels, int Stages>
-    struct mavg_state : fir_state<Scalar, Length, multiply_extents<Channels, Stages>::value>
+    struct MAvgState : FIRState<Scalar, Length, multiply_extents<Channels, Stages>::value>
     {
         enum { Rows = multiply_extents<Channels, Stages>::value };
 
-        using Base = fir_state<Scalar, Length, Rows>;
+        using Base = FIRState<Scalar, Length, Rows>;
 
-        mavg_state() : num_(0), correct_num_(0)
+        MAvgState() : num_(0), correct_num_(0)
         {
             if (Length != Eigen::Dynamic && Rows != Eigen::Dynamic)
                 initialize();
         }
 
-        void setup(const mavg_coeffs<Scalar, Length, Stages>& coeffs, int nchans)
+        void setup(const MAvgCoeffs<Scalar, Length, Stages>& coeffs, int nchans)
         {
             const Eigen::DenseIndex rws = coeffs.stages() * nchans;
             const Eigen::DenseIndex len = coeffs.length();
@@ -92,7 +92,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const mavg_coeffs<Scalar, Length, Stages>& coeffs,
+        void apply(const MAvgCoeffs<Scalar, Length, Stages>& coeffs,
                    Eigen::ArrayBase<X>& xi)
         {
             using namespace Eigen;
@@ -140,24 +140,24 @@ namespace disiple {
     // cumulative moving average
 
     template <typename Scalar>
-    struct cmavg_coeffs
+    struct CumMAvgCoeffs
     {
-        cmavg_coeffs() {}
-        explicit cmavg_coeffs(int n) {}
+        CumMAvgCoeffs() {}
+        explicit CumMAvgCoeffs(int n) {}
 
         static int    length()  { return 1; }
     };
 
     template <typename Scalar, int Channels>
-    struct cmavg_state
+    struct CumMAvgState
     {
-        cmavg_state() : num_(0)
+        CumMAvgState() : num_(0)
         {
             if (Channels != Eigen::Dynamic)
                 initialize();
         }
 
-        void setup(const cmavg_coeffs<Scalar>& coeffs, int nchans)
+        void setup(const CumMAvgCoeffs<Scalar>& coeffs, int nchans)
         {
             if (avg_.size() != nchans)
             {
@@ -172,7 +172,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const cmavg_coeffs<Scalar>&,
+        void apply(const CumMAvgCoeffs<Scalar>&,
                    Eigen::ArrayBase<X>& xi)
         {
             ++num_;

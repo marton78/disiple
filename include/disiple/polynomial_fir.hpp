@@ -13,24 +13,24 @@ namespace disiple {
     ///     $$ a_i = \sum_j p_ij n^j / \sum_k q_ik n^k $$
     /// with $t \in [1, T]$, $i \in [0, I)$, $j \in [0, J)$ and $k \in [0, K)$.
     template <typename Element, int I, int J, int K, int Length = Eigen::Dynamic>
-    struct polynomial_fir : public filter_base<Element,
-        poly_fir_state<typename element_traits<Element>::Scalar, Length, element_traits<Element>::Channels, I>,
-        poly_fir_coeffs<typename element_traits<Element>::Scalar, Length, I, J, K>
+    struct PolynomialFIR : public FilterBase<Element,
+        PolyFIRState<typename ElementTraits<Element>::Scalar, Length, ElementTraits<Element>::Channels, I>,
+        PolyFIRCoeffs<typename ElementTraits<Element>::Scalar, Length, I, J, K>
     >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        using Scalar = typename element_traits<Element>::Scalar;
-        using State  = poly_fir_state<Scalar, Length, Channels, I>;
-        using Coeffs = poly_fir_coeffs<Scalar, Length, I, J, K>;
-        using Base   = filter_base<Element, State, Coeffs>;
+        enum { Channels = ElementTraits<Element>::Channels };
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using State  = PolyFIRState<Scalar, Length, Channels, I>;
+        using Coeffs = PolyFIRCoeffs<Scalar, Length, I, J, K>;
+        using Base   = FilterBase<Element, State, Coeffs>;
 
-        polynomial_fir() {}
+        PolynomialFIR() {}
 
         /// Initialize the filter.
         template <typename P, typename Q>
-        polynomial_fir(const Eigen::ArrayBase<P>& p,   ///< Numerator of the weights, must be I x J
-                       const Eigen::ArrayBase<Q>& q,   ///< Denominator of the weights, must be I x K
-                       int window_length               ///< Length of the window. Must be equal to @Length if not dynamic.
+        PolynomialFIR(const Eigen::ArrayBase<P>& p,   ///< Numerator of the weights, must be I x J
+                      const Eigen::ArrayBase<Q>& q,   ///< Denominator of the weights, must be I x K
+                      int window_length               ///< Length of the window. Must be equal to @Length if not dynamic.
         ) : Base(p, q, window_length)
         {
             static_assert(I != Eigen::Dynamic && J != Eigen::Dynamic && K != Eigen::Dynamic,

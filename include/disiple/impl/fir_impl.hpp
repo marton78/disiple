@@ -6,19 +6,19 @@
 namespace disiple {
 
     template <typename Scalar, int Length>
-    struct fir_coeffs
+    struct FIRCoeffs
     {
-        fir_coeffs() {
+        FIRCoeffs() {
             if (Length != Eigen::Dynamic) {
                 b_.setZero();
                 b_[0] = 1;
             }
         }
 
-        explicit fir_coeffs(fir_design d) : b_(d.coeffs.cast<Scalar>()) {}
+        explicit FIRCoeffs(FIRDesign d) : b_(d.coeffs.cast<Scalar>()) {}
 
         template <typename T>
-        explicit fir_coeffs(T&& t) : b_(std::forward<T>(t)) {}
+        explicit FIRCoeffs(T&& t) : b_(std::forward<T>(t)) {}
 
         int length() const { return static_cast<int>(b_.size()); }
 
@@ -26,9 +26,9 @@ namespace disiple {
     };
 
     template <typename Scalar, int Length, int Channels>
-    struct fir_state
+    struct FIRState
     {
-        fir_state() : pos_(0)
+        FIRState() : pos_(0)
         {
             if (Channels != Eigen::Dynamic && Length != Eigen::Dynamic)
                 initialize();
@@ -59,7 +59,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const fir_coeffs<Scalar, Length>& coeffs,
+        void apply(const FIRCoeffs<Scalar, Length>& coeffs,
                    Eigen::ArrayBase<X>& xi)
         {
             advance();
@@ -72,7 +72,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const fir_coeffs<Scalar, Length>& coeffs,
+        void apply(const FIRCoeffs<Scalar, Length>& coeffs,
                    const Eigen::ArrayBase<X>& xi, DryRun)
         {
             advance();

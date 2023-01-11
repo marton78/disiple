@@ -22,12 +22,12 @@ struct TestFixtureIIR
     Array<Scalar, Dynamic, Dynamic> raw_data, mlp_data, mhp_data, mbp_data, mbs_data,
                                     mc1_data, mc2_data, mno50_data, mno100_data, mco_data;
 
-    iir_design dlp, dhp, dbp, dbs, dc1, dc2, dno50, dno100, dco;
+    IIRDesign dlp, dhp, dbp, dbs, dc1, dc2, dno50, dno100, dco;
 
-    iir_design*                      dyn_designs[ndyn_design];
+    IIRDesign*                      dyn_designs[ndyn_design];
     Array<Scalar, Dynamic, Dynamic>* dyn_data[ndyn_design];
 
-    iir_design*                      stat_designs[nstat_design];
+    IIRDesign*                      stat_designs[nstat_design];
     Array<Scalar, Dynamic, Dynamic>* stat_data[nstat_design];
 
     TestFixtureIIR()
@@ -41,12 +41,12 @@ struct TestFixtureIIR
     , mno50_data(nchan, ndata)
     , mno100_data(nchan, ndata)
     , mco_data(nchan, ndata)
-    , dlp(butterworth(3), lowpass(.1))
-    , dhp(butterworth(3), highpass(.2))
-    , dbp(butterworth(3), bandpass(.15, .25))
-    , dbs(butterworth(2), bandstop(.4, .5))
-    , dc1(chebyshev1(4, 5.),  bandpass(.1, .4))
-    , dc2(chebyshev2(3, 10.), bandstop(.1, .4))
+    , dlp(butterworth(3), Lowpass(.1))
+    , dhp(butterworth(3), Highpass(.2))
+    , dbp(butterworth(3), Bandpass(.15, .25))
+    , dbs(butterworth(2), Bandstop(.4, .5))
+    , dc1(chebyshev1(4, 5.),  Bandpass(.1, .4))
+    , dc2(chebyshev2(3, 10.), Bandstop(.1, .4))
     , dno50(notch(50.0/125,(50.0/125)/35))
     , dno100(notch(100.0/125,(100.0/125)/35))
     , dco(comb(250.0/50.0,(50.0/125)/35))
@@ -158,10 +158,10 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
 ) {
     const TestFixtureIIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = iir<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 2, Type>;
+    using Filter = IIR<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 2, Type>;
 
     const size_t             ndesign = DynOrder ? ndyn_design : nstat_design;
-    const iir_design* const* designs = DynOrder ? fix.dyn_designs : fix.stat_designs;
+    const IIRDesign* const*  designs = DynOrder ? fix.dyn_designs : fix.stat_designs;
     const auto* const*       refdata = DynOrder ? fix.dyn_data : fix.stat_data;
 
     SECTION("in_place", "IIR filter applied in place") {
@@ -215,13 +215,13 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
         Array<Scalar, Dynamic, Dynamic> x = fix.raw_data.colwise() + x0;
 
         // For a lowpass filter, we expect the output to contain the offset x0
-        iir<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 2, Type> flp(fix.dlp); flp.initialize(x0);
+        IIR<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 2, Type> flp(fix.dlp); flp.initialize(x0);
         flp.apply(x, y);
         Scalar maxdev_lp = (fix.mlp_data.colwise() + x0 - y).abs().maxCoeff();
         REQUIRE( maxdev_lp <= threshold<Scalar>() );
 
         // For a bandpass filter, we expect that the offset is removed
-        iir<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 3, Type> fbp(fix.dbp); fbp.initialize(x0);
+        IIR<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 3, Type> fbp(fix.dbp); fbp.initialize(x0);
         fbp.apply(x, y);
         Scalar maxdev_bp = (fix.mbp_data - y).abs().maxCoeff();
         REQUIRE( maxdev_bp <= threshold<Scalar>() );
@@ -238,11 +238,11 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of scalars", "[iir]",
 ) {
     const TestFixtureIIR<Scalar> fix;
     Array<Scalar, 1, Dynamic> y(ndata);
-    using Filter = iir<Scalar, Dynamic, Type>;
+    using Filter = IIR<Scalar, Dynamic, Type>;
 
-    const size_t             ndesign = DynOrder ? ndyn_design : nstat_design;
-    const iir_design* const* designs = DynOrder ? fix.dyn_designs : fix.stat_designs;
-    const auto* const*       refdata = DynOrder ? fix.dyn_data : fix.stat_data;
+    const size_t            ndesign = DynOrder ? ndyn_design : nstat_design;
+    const IIRDesign* const* designs = DynOrder ? fix.dyn_designs : fix.stat_designs;
+    const auto* const*      refdata = DynOrder ? fix.dyn_data : fix.stat_data;
 
     for (size_t i=0; i<ndesign; ++i) {
         Filter f(*(designs[i]));
@@ -262,7 +262,7 @@ TEST_CASE("IIR filter response", "[iir]")
     resp_real << 0.0,   -0.301014832400589682492864085361,    0.985837693694599837002101594408,    0.105406698500557644004871349352,   -0.450518631772160838000473859211,   -0.122967748079539376804270034427,   -0.025462153010374528883108524724,   -0.003803085414789983929872985158,   -0.000203332660011809661457921061,    0.0;
     resp_imag << 0.0,    0.807314371339338587851841566589,   -0.167701182610685006757478276995,   -0.953437293401544816440207341657,   -0.128390059799641548243798183648,    0.063234523098741196589500646041,    0.030406008571820575259181396177,    0.008442758976603353601730894695,    0.000995779213869737262962433810,    0.0;
 
-    second_order_sections<double> sos = iir_design(butterworth(3), bandpass(.1, .4));
+    SecondOrderSections<double> sos = IIRDesign(butterworth(3), Bandpass(.1, .4));
     ArrayXd f = ArrayXd::LinSpaced(10, 0, 1);
     ArrayXcd z(10);
     sos.response(f, z);

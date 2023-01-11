@@ -11,11 +11,11 @@ namespace disiple {
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
     template <typename Scalar>
-    struct running_minmax_coeffs
+    struct RunningMinMaxCoeffs
     {
-        running_minmax_coeffs() : len_(0) {}
+        RunningMinMaxCoeffs() : len_(0) {}
 
-        explicit running_minmax_coeffs(int len)
+        explicit RunningMinMaxCoeffs(int len)
         : len_(len) {}
 
         static Scalar scaling() { return Scalar(1); }
@@ -25,13 +25,13 @@ namespace disiple {
     };
 
     template <typename Element, template<typename> class Compare>
-    struct running_minmax_state
+    struct RunningMinMaxState
     {
-        enum { Channels = element_traits<Element>::Channels };
-        using Scalar = typename element_traits<Element>::Scalar;
-        using Coeffs = running_minmax_coeffs<Scalar>;
+        enum { Channels = ElementTraits<Element>::Channels };
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
-        running_minmax_state()
+        RunningMinMaxState()
         {
             if (Channels != Eigen::Dynamic)
                 initialize();
@@ -105,10 +105,10 @@ namespace disiple {
 
 
     template <typename Element>
-    struct running_range_state
+    struct RunningRangeState
     {
-        using Scalar = typename element_traits<Element>::Scalar;
-        using Coeffs = running_minmax_coeffs<Scalar>;
+        using Scalar = typename ElementTraits<Element>::Scalar;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
         void setup(const Coeffs& coeffs, int nchans)
         {
@@ -139,8 +139,8 @@ namespace disiple {
             smax.apply(coeffs, xi, dry_run);
         }
 
-        running_minmax_state<Element, std::less>    smin;
-        running_minmax_state<Element, std::greater> smax;
+        RunningMinMaxState<Element, std::less>    smin;
+        RunningMinMaxState<Element, std::greater> smax;
     };
 
 }

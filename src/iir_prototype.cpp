@@ -6,9 +6,9 @@ inline double asinh(double x) { return std::log(x + std::sqrt(x*x + 1.0)); }
 
 namespace disiple {
 
-    iir_prototype butterworth(int num_poles)
+    IIRPrototype butterworth(int num_poles)
     {
-        iir_prototype result;
+        IIRPrototype result;
         result.set_normal(0, 1);
 
         const double n2 = 2 * num_poles;
@@ -17,7 +17,7 @@ namespace disiple {
         for (int i = 0; i < pairs; ++i)
         {
             double theta = pi_half + (2 * i + 1) * pi/n2;
-            complex_t c(cos(theta), sin(theta));
+            Complex c(cos(theta), sin(theta));
             result.add_conjugate_pair(c, std::numeric_limits<double>::infinity());
         }
 
@@ -27,9 +27,9 @@ namespace disiple {
         return result;
     };
 
-    iir_prototype butterworth_shelf(int num_poles, double gain_db)
+    IIRPrototype butterworth_shelf(int num_poles, double gain_db)
     {
-        iir_prototype result;
+        IIRPrototype result;
         result.set_normal(pi, 1);
 
         const double n2 = 2 * num_poles;
@@ -40,7 +40,7 @@ namespace disiple {
         for (int i = 1; i <= pairs; ++i)
         {
             double theta = pi_half - (2 * i - 1) * pi/n2;
-            complex_t c(cos(theta), sin(theta));
+            Complex c(cos(theta), sin(theta));
             result.add_conjugate_pair(gp * c, gz * c);
         }
 
@@ -54,9 +54,9 @@ namespace disiple {
     // Chebyshev Type I
     // http://cnx.org/content/m16906/latest/
 
-    iir_prototype chebyshev1(int num_poles, double ripple_db)
+    IIRPrototype chebyshev1(int num_poles, double ripple_db)
     {
-        iir_prototype result;
+        IIRPrototype result;
 
         const double e2 = pow(10.0, ripple_db * 0.1);
         const double eps = std::sqrt(e2 - 1.);
@@ -72,7 +72,7 @@ namespace disiple {
             double a = sinh_v0 * cos(theta);
             double b = cosh_v0 * sin(theta);
 
-            result.add_conjugate_pair(complex_t(a, b), std::numeric_limits<double>::infinity());
+            result.add_conjugate_pair(Complex(a, b), std::numeric_limits<double>::infinity());
         }
 
         if (num_poles & 1) {
@@ -87,9 +87,9 @@ namespace disiple {
 
     // Chebyshev Type II
 
-    iir_prototype chebyshev2(int num_poles, double ripple_db)
+    IIRPrototype chebyshev2(int num_poles, double ripple_db)
     {
-        iir_prototype result;
+        IIRPrototype result;
         result.set_normal(0.0, 1.0);
 
         const double eps = std::sqrt((pow(10.0, ripple_db * 0.1)-1));
@@ -106,7 +106,7 @@ namespace disiple {
             double b = cosh_v0 * sin(theta);
             double d2 = a*a + b*b;
             double im = 1.0/cos(k*fn);
-            result.add_conjugate_pair(complex_t(a/d2, b/d2), complex_t(0, im));
+            result.add_conjugate_pair(Complex(a/d2, b/d2), Complex(0, im));
         }
 
         if (num_poles & 1)

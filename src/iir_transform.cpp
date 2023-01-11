@@ -2,7 +2,7 @@
 
 namespace disiple {
 
-    static const complex_t infinity(std::numeric_limits<double>::infinity());
+    static const Complex infinity(std::numeric_limits<double>::infinity());
 
     /*
      * s-plane to z-plane transforms
@@ -17,16 +17,16 @@ namespace disiple {
 
     //------------------------------------------------------------------------------
 
-    void lowpass::operator()(const iir_prototype& analog, iir_design& digital) const
+    void Lowpass::operator()(const IIRPrototype& analog, IIRDesign& digital) const
     {
         const int numPoles = analog.num_poles();
         const int pairs = numPoles / 2;
         const double f = tan(pi_half * cutoff_);
 
-        auto transform = [f] (complex_t c) -> complex_t
+        auto transform = [f] (Complex c) -> Complex
         {
             if (c == infinity)
-                return complex_t(-1, 0);
+                return Complex(-1, 0);
 
             // frequency transform
             c = f * c;
@@ -46,8 +46,8 @@ namespace disiple {
             const pole_zero_pair& pair = analog[pairs];
             assert(pair.poles.first.imag()==0);
             assert(pair.zeros.first.imag()==0);
-            complex_t p = transform(pair.poles.first);
-            complex_t z = transform(pair.zeros.first);
+            Complex p = transform(pair.poles.first);
+            Complex z = transform(pair.zeros.first);
             digital.add_single(p.real(), z.real());
         }
 
@@ -57,16 +57,16 @@ namespace disiple {
 
     //------------------------------------------------------------------------------
 
-    void highpass::operator()(const iir_prototype& analog, iir_design& digital) const
+    void Highpass::operator()(const IIRPrototype& analog, IIRDesign& digital) const
     {
         const int numPoles = analog.num_poles();
         const int pairs = numPoles / 2;
         const double f = 1. / tan(pi_half * cutoff_);
 
-        auto transform = [f] (complex_t c) -> complex_t
+        auto transform = [f] (Complex c) -> Complex
         {
             if (c == infinity)
-                return complex_t (1, 0);
+                return Complex (1, 0);
 
             // frequency transform
             c = f * c;
@@ -87,8 +87,8 @@ namespace disiple {
             const pole_zero_pair& pair = analog[pairs];
             assert(pair.poles.first.imag()==0);
             assert(pair.zeros.first.imag()==0);
-            complex_t p = transform(pair.poles.first);
-            complex_t z = transform(pair.zeros.first);
+            Complex p = transform(pair.poles.first);
+            Complex z = transform(pair.zeros.first);
             digital.add_single(p.real(), z.real());
         }
 
@@ -97,7 +97,7 @@ namespace disiple {
 
     //------------------------------------------------------------------------------
 
-    void bandpass::operator()(const iir_prototype& analog, iir_design& digital) const
+    void Bandpass::operator()(const IIRPrototype& analog, IIRDesign& digital) const
     {
         const int numPoles = analog.num_poles();
         const int pairs = numPoles / 2;
@@ -118,31 +118,31 @@ namespace disiple {
         const double t1 = 4.0 * (t+1);
         const double t2 = 8.0 * (t-1);
 
-        auto transform = [&] (complex_t c) -> complex_pair
+        auto transform = [&] (Complex c) -> ComplexPair
         {
             if (c == infinity)
-                return complex_pair(-1, 1);
+                return ComplexPair(-1, 1);
 
             c = (1. + c) / (1. - c); // bilinear
 
-            complex_t w = ab_2 * c + ab_2;
-            complex_t v = std::sqrt(((t1*c + t2) * c) + t1);
-            complex_t d = 2.0 * ((b-1)*c + (b+1));
+            Complex w = ab_2 * c + ab_2;
+            Complex v = std::sqrt(((t1*c + t2) * c) + t1);
+            Complex d = 2.0 * ((b-1)*c + (b+1));
 
-            return complex_pair((w-v)/d, (w+v)/d);
+            return ComplexPair((w-v)/d, (w+v)/d);
         };
 
         for (int i = 0; i < pairs; ++i)
         {
             const pole_zero_pair& pair = analog[i];
-            complex_pair p1 = transform(pair.poles.first);
-            complex_pair z1 = transform(pair.zeros.first);
+            ComplexPair p1 = transform(pair.poles.first);
+            ComplexPair z1 = transform(pair.zeros.first);
 
             //
             // Optimize out the calculations for conjugates for Release builds
             //
 #if !defined(NDEBUG)
-            complex_pair p2 = transform(pair.poles.second);
+            ComplexPair p2 = transform(pair.poles.second);
             assert (p2.first == std::conj(p1.first));
             assert (p2.second == std::conj(p1.second));
 #endif
@@ -156,8 +156,8 @@ namespace disiple {
             const pole_zero_pair& pair = analog[pairs];
             assert(pair.poles.first.imag()==0);
             assert(pair.zeros.first.imag()==0);
-            complex_pair poles = transform(pair.poles.first);
-            complex_pair zeros = transform(pair.zeros.first);
+            ComplexPair poles = transform(pair.poles.first);
+            ComplexPair zeros = transform(pair.zeros.first);
 
             digital.add(poles, zeros);
         }
@@ -169,7 +169,7 @@ namespace disiple {
 
     //------------------------------------------------------------------------------
 
-    void bandstop::operator()(const iir_prototype& analog, iir_design& digital) const
+    void Bandstop::operator()(const IIRPrototype& analog, IIRDesign& digital) const
     {
         const int numPoles = analog.num_poles();
         const int pairs = numPoles / 2;
@@ -190,25 +190,25 @@ namespace disiple {
         const double t1 = 4.0 * (b2 + a2 - 1.0);
         const double t2 = 8.0 * (b2 - a2 + 1.0);
 
-        auto transform = [&] (complex_t c) -> complex_pair
+        auto transform = [&] (Complex c) -> ComplexPair
         {
             if (c == infinity)
                 c = -1;
             else
                 c = (1. + c) / (1. - c); // bilinear
 
-            complex_t w = a * (1.0-c);
-            complex_t u = 0.5 * std::sqrt((t1 * c + t2) * c + t1);
-            complex_t d = (b-1.0)*c + (b+1.0);
+            Complex w = a * (1.0-c);
+            Complex u = 0.5 * std::sqrt((t1 * c + t2) * c + t1);
+            Complex d = (b-1.0)*c + (b+1.0);
 
-            return complex_pair((w+u)/d, (w-u)/d);
+            return ComplexPair((w+u)/d, (w-u)/d);
         };
 
         for (int i = 0; i < pairs; ++i)
         {
             const pole_zero_pair& pair = analog[i];
-            complex_pair p  = transform(pair.poles.first);
-            complex_pair z  = transform(pair.zeros.first);
+            ComplexPair p  = transform(pair.poles.first);
+            ComplexPair z  = transform(pair.zeros.first);
 
             //
             // Optimize out the calculations for conjugates for Release builds
@@ -220,8 +220,8 @@ namespace disiple {
 //
 //#else
 //            // Do the full calculation to verify correctness
-//            //            complex_pair pc = transform (analog[i].poles.second);
-//            complex_pair zc = transform (analog[i].zeros.second);
+//            //            ComplexPair pc = transform (analog[i].poles.second);
+//            ComplexPair zc = transform (analog[i].zeros.second);
 //
 //            // get the conjugates into pc and zc
 //            if (zc.first == z.first)
@@ -243,8 +243,8 @@ namespace disiple {
             assert(pair.poles.first.imag()==0);
             assert(pair.zeros.first.imag()==0);
 
-            complex_pair poles = transform(pair.poles.first);
-            complex_pair zeros = transform(pair.zeros.first);
+            ComplexPair poles = transform(pair.poles.first);
+            ComplexPair zeros = transform(pair.zeros.first);
 
             digital.add(poles, zeros);
         }

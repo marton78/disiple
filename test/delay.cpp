@@ -40,7 +40,7 @@ TEMPLATE_TEST_CASE_SIG("Delay filter", "[delay]",
     TestFixtureDelay<Scalar> fix;
     enum { Length = TestFixtureDelay<Scalar>::Length };
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = delay<Array<Scalar, NChan, 1>, DynLength ? Dynamic : Length>;
+    using Filter = Delay<Array<Scalar, NChan, 1>, DynLength ? Dynamic : Length>;
 
     SECTION("in_place", "Delay filter applied in place") {
         Filter f(Length);

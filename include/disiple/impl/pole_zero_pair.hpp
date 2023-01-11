@@ -9,18 +9,18 @@ namespace disiple {
     static const double pi      = 3.1415926535897932384626433832795028841971;
     static const double two_pi  = pi * 2.0;
     static const double pi_half = pi * 0.5;
-    using complex_t = std::complex<double>;
+    using Complex = std::complex<double>;
 
-    struct complex_pair : std::pair<complex_t, complex_t>
+    struct ComplexPair : std::pair<Complex, Complex>
     {
-        complex_pair() {}
+        ComplexPair() {}
 
-        explicit complex_pair(const complex_t& c1)
-        : std::pair<complex_t, complex_t>(c1, 0.)
+        explicit ComplexPair(const Complex& c1)
+        : std::pair<Complex, Complex>(c1, 0.)
         { assert(c1.imag() == 0); }
 
-        complex_pair(const complex_t& c1, const complex_t& c2)
-        : std::pair<complex_t, complex_t>(c1, c2)
+        ComplexPair(const Complex& c1, const Complex& c2)
+        : std::pair<Complex, Complex>(c1, c2)
         {}
 
         bool is_conjugate() const { return second == std::conj(first); }
@@ -42,19 +42,19 @@ namespace disiple {
     // A pair of pole/zeros. This fits in a biquad (but is missing the gain)
     struct pole_zero_pair
     {
-        complex_pair poles;
-        complex_pair zeros;
+        ComplexPair poles;
+        ComplexPair zeros;
 
         pole_zero_pair() {}
 
         // single pole/zero
-        pole_zero_pair(const complex_t& p, const complex_t& z)
+        pole_zero_pair(const Complex& p, const Complex& z)
         : poles(p), zeros(z)
         {}
 
         // pole/zero pair
-        pole_zero_pair(const complex_t& pole1, const complex_t& zero1,
-                       const complex_t& pole2, const complex_t& zero2)
+        pole_zero_pair(const Complex& pole1, const Complex& zero1,
+                       const Complex& pole2, const Complex& zero2)
         : poles(pole1, pole2) , zeros(zero1, zero2)
         {}
 
