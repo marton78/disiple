@@ -73,7 +73,7 @@ namespace disiple {
 
         template <typename X>
         void apply(const fir_coeffs<Scalar, Length>& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             advance();
             buf_.col(pos_) = xi;

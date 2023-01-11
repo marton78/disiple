@@ -114,14 +114,14 @@ namespace disiple {
 
         float fir_gain(Eigen::ArrayXf const& coeffs)
         {
-            using pair_type    = std::pair<uint32_t, fft>;
-            using storage_type = std::vector<pair_type>;
+            using Pair    = std::pair<uint32_t, fft>;
+            using Storage = std::vector<Pair>;
 
             // avoid reallocations between runs
             static std::mutex           mut;
             static Eigen::ArrayXf       x;
             static Eigen::ArrayXcf      z;
-            static storage_type         ffts;
+            static Storage              ffts;
 
             std::lock_guard<std::mutex> locker(mut);
 
@@ -136,7 +136,7 @@ namespace disiple {
 
             // check if an fft of length n already exists
             auto it = std::find_if(ffts.begin(), ffts.end(),
-                                   [n] (pair_type const& p) { return p.first == n; });
+                                   [n] (Pair const& p) { return p.first == n; });
 
             // if not, construct it
             if (it == ffts.end()) {

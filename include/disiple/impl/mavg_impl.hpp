@@ -62,7 +62,7 @@ namespace disiple {
     {
         enum { Rows = multiply_extents<Channels, Stages>::value };
 
-        using base_type = fir_state<Scalar, Length, Rows>;
+        using Base = fir_state<Scalar, Length, Rows>;
 
         mavg_state() : num_(0), correct_num_(0)
         {
@@ -74,10 +74,10 @@ namespace disiple {
         {
             const Eigen::DenseIndex rws = coeffs.stages() * nchans;
             const Eigen::DenseIndex len = coeffs.length();
-            if (base_type::num_chans() != rws ||
-                base_type::length()    != len)
+            if (Base::num_chans() != rws ||
+                Base::length()    != len)
             {
-                base_type::buf_.resize(rws, len);
+                Base::buf_.resize(rws, len);
                 sum_.resize(nchans, coeffs.stages());
                 correct_sum_.resize(nchans, coeffs.stages());
                 initialize();
@@ -86,7 +86,7 @@ namespace disiple {
 
         void initialize()
         {
-            base_type::initialize();
+            Base::initialize();
             sum_.setZero(); correct_sum_.setZero();
             num_ = 0;       correct_num_ = static_cast<int>(buf_.cols());
         }
@@ -127,9 +127,9 @@ namespace disiple {
 
         }
 
-        using base_type::advance;
-        using base_type::buf_;
-        using base_type::pos_;
+        using Base::advance;
+        using Base::buf_;
+        using Base::pos_;
         Eigen::Array<Scalar, Channels, Stages> sum_, correct_sum_;
         int num_, correct_num_;
 

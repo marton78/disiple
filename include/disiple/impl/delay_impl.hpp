@@ -28,16 +28,16 @@ namespace disiple {
     template <typename Scalar, int Length, int Channels>
     struct delay_state : fir_state<Scalar, Length, Channels>
     {
-        using base_type = fir_state<Scalar, Length, Channels>;
+        using Base = fir_state<Scalar, Length, Channels>;
 
-        delay_state() : base_type() {}
+        delay_state() : Base() {}
 
-        using base_type::initialize;
-        using base_type::advance;
+        using Base::initialize;
+        using Base::advance;
 
         void setup(const delay_coeffs<Scalar, Length>& coeffs, int nchans)
         {
-            base_type::setup(coeffs, nchans);
+            Base::setup(coeffs, nchans);
             prev_.resize(nchans);
         }
 
@@ -53,15 +53,15 @@ namespace disiple {
 
         template <typename X>
         void apply(const delay_coeffs<Scalar, Length>& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             advance();
             buf_.col(pos_) = xi;
         }
 
         Eigen::Array<Scalar, Channels, 1> prev_;
-        using base_type::buf_;
-        using base_type::pos_;
+        using Base::buf_;
+        using Base::pos_;
     };
 
 }

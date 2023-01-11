@@ -12,8 +12,8 @@ namespace disiple {
     class second_order_sections
     {
     public:
-        using coeffs_t = Eigen::Array<Scalar, 4, Stages>;
-        using column_t = typename coeffs_t::ConstColXpr;
+        using Coeffs = Eigen::Array<Scalar, 4, Stages>;
+        using Column = typename Coeffs::ConstColXpr;
 
         second_order_sections() : scaling_(1) { coeffs_.setZero(); }
         second_order_sections(const iir_design& l);
@@ -34,10 +34,10 @@ namespace disiple {
         Scalar m2(int i) const { return coeffs_(3,i); }
         Scalar scaling() const { return scaling_; }
 
-        column_t coeffs(int i) const { return coeffs_.col(i); }
+        Column coeffs(int i) const { return coeffs_.col(i); }
 
     protected:
-        coeffs_t  coeffs_;
+        Coeffs  coeffs_;
         Scalar    scaling_;
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW

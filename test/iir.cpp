@@ -146,7 +146,7 @@ struct TestFixtureIIR
 };
 
 TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
-    ((typename Scalar, int NChan, bool DynOrder, implementation_type Type), Scalar, NChan, DynOrder, Type), 
+    ((typename Scalar, int NChan, bool DynOrder, IIRImplementation Type), Scalar, NChan, DynOrder, Type), 
     (float,  Dynamic, true,  DF1), (float,  Dynamic, true,  DF2), (float,  Dynamic, true,  DF2T),
     (double, Dynamic, true,  DF1), (double, Dynamic, true,  DF2), (double, Dynamic, true,  DF2T),
     (float,  nchan,   true,  DF1), (float,  nchan,   true,  DF2), (float,  nchan,   true,  DF2T),
@@ -230,7 +230,7 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
 }
 
 TEMPLATE_TEST_CASE_SIG("IIR Filter of scalars", "[iir]",
-    ((typename Scalar, bool DynOrder, implementation_type Type), Scalar, DynOrder, Type), 
+    ((typename Scalar, bool DynOrder, IIRImplementation Type), Scalar, DynOrder, Type), 
     (float,  true,  DF1), (float,  true,  DF2), (float,  true,  DF2T),
     (double, true,  DF1), (double, true,  DF2), (double, true,  DF2T),
     (float,  false, DF1), (float,  false, DF2), (float,  false, DF2T),

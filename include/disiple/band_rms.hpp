@@ -21,15 +21,15 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = band_rms_state <Scalar, Bandpass, Expectation>;
-        using coeffs_type = band_rms_coeffs<Scalar, Bandpass, Expectation>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = band_rms_state <Scalar, Bandpass, Expectation>;
+        using Coeffs = band_rms_coeffs<Scalar, Bandpass, Expectation>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         band_rms() {}
 
         template <typename TB, typename TE>
-        band_rms(TB&& b, TE&& e) : base_type(std::forward<TB>(b), std::forward<TE>(e))
+        band_rms(TB&& b, TE&& e) : Base(std::forward<TB>(b), std::forward<TE>(e))
         {}
     };
 
@@ -45,8 +45,8 @@ namespace disiple {
 
         Scalar scaling() { return bpc_.scaling() * exc_.scaling(); }
 
-        typename Bandpass::coeffs_type    bpc_;
-        typename Expectation::coeffs_type exc_;
+        typename Bandpass::Coeffs    bpc_;
+        typename Expectation::Coeffs exc_;
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
@@ -54,9 +54,9 @@ namespace disiple {
     template <typename Scalar, typename Bandpass, typename Expectation>
     struct band_rms_state
     {
-        using coeffs_type = band_rms_coeffs<Scalar, Bandpass, Expectation>;
+        using Coeffs = band_rms_coeffs<Scalar, Bandpass, Expectation>;
 
-        void setup(const coeffs_type& coeffs, int nchans)
+        void setup(const Coeffs& coeffs, int nchans)
         {
             bps_.setup(coeffs.bpc_, nchans);
             exs_.setup(coeffs.exc_, nchans);
@@ -69,7 +69,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void initialize(const coeffs_type& coeffs, const Eigen::ArrayBase<X>& x_ss)
+        void initialize(const Coeffs& coeffs, const Eigen::ArrayBase<X>& x_ss)
         {
             bps_.initialize(coeffs.bpc_, x_ss);
             exs_.initialize(coeffs.exc_, x_ss);
@@ -86,8 +86,8 @@ namespace disiple {
         }
 
 
-        typename Bandpass::state_type    bps_;
-        typename Expectation::state_type exs_;
+        typename Bandpass::State    bps_;
+        typename Expectation::State exs_;
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };

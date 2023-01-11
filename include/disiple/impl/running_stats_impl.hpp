@@ -55,7 +55,7 @@ namespace disiple {
 
         template <typename X>
         void apply(const Coeffs& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             //David Lemire, “Streaming Maximum-Minimum Filter
             //Using No More than Three Comparisons per Element”
@@ -133,7 +133,7 @@ namespace disiple {
 
         template <typename X>
         void apply(const Coeffs& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             smin.apply(coeffs, xi, dry_run);
             smax.apply(coeffs, xi, dry_run);

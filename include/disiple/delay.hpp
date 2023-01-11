@@ -12,13 +12,13 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = delay_state<Scalar, Length, Channels>;
-        using coeffs_type = delay_coeffs<Scalar, Length>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = delay_state<Scalar, Length, Channels>;
+        using Coeffs = delay_coeffs<Scalar, Length>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         delay() {}
-        explicit delay(int length) : base_type(length) {}
+        explicit delay(int length) : Base(length) {}
     };
 
 }

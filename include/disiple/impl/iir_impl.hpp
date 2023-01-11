@@ -5,9 +5,9 @@
 
 namespace disiple {
 
-    enum implementation_type { DF1, DF2, DF1T, DF2T };
+    enum IIRImplementation { DF1, DF2, DF1T, DF2T };
 
-    template <typename Scalar, int Stages, int Channels, implementation_type Type>
+    template <typename Scalar, int Stages, int Channels, IIRImplementation Type>
     struct iir_impl;
 
 

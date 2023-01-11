@@ -12,14 +12,14 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = mavg_state<Scalar, Length, Channels, Stages>;
-        using coeffs_type = mavg_coeffs<Scalar, Length, Stages>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = mavg_state<Scalar, Length, Channels, Stages>;
+        using Coeffs = mavg_coeffs<Scalar, Length, Stages>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         moving_average() {}
-        explicit moving_average(int length) : base_type(length) {}
-        moving_average(int length, int stages) : base_type(length, stages) {}
+        explicit moving_average(int length) : Base(length) {}
+        moving_average(int length, int stages) : Base(length, stages) {}
     };
 
 
@@ -30,13 +30,13 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = cmavg_state<Scalar, Channels>;
-        using coeffs_type = cmavg_coeffs<Scalar>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = cmavg_state<Scalar, Channels>;
+        using Coeffs = cmavg_coeffs<Scalar>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         cum_moving_average() {}
-        explicit cum_moving_average(int length) : base_type(length) {}
+        explicit cum_moving_average(int length) : Base(length) {}
     };
 
 }

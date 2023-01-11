@@ -19,10 +19,10 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = poly_fir_state<Scalar, Length, Channels, I>;
-        using coeffs_type = poly_fir_coeffs<Scalar, Length, I, J, K>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = poly_fir_state<Scalar, Length, Channels, I>;
+        using Coeffs = poly_fir_coeffs<Scalar, Length, I, J, K>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         polynomial_fir() {}
 
@@ -31,7 +31,7 @@ namespace disiple {
         polynomial_fir(const Eigen::ArrayBase<P>& p,   ///< Numerator of the weights, must be I x J
                        const Eigen::ArrayBase<Q>& q,   ///< Denominator of the weights, must be I x K
                        int window_length               ///< Length of the window. Must be equal to @Length if not dynamic.
-        ) : base_type(p, q, window_length)
+        ) : Base(p, q, window_length)
         {
             static_assert(I != Eigen::Dynamic && J != Eigen::Dynamic && K != Eigen::Dynamic,
                           "All polynomials must be fixed-size!");

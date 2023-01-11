@@ -17,12 +17,12 @@ namespace disiple {
         running_minmax_coeffs<typename element_traits<Element>::Scalar>
     >
     {
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = running_minmax_state<Element, std::less>;
-        using coeffs_type = running_minmax_coeffs<Scalar>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = running_minmax_state<Element, std::less>;
+        using Coeffs = running_minmax_coeffs<Scalar>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
-        explicit running_min(int len) : base_type(len) {}
+        explicit running_min(int len) : Base(len) {}
     };
 
     template <typename Element>
@@ -32,11 +32,11 @@ namespace disiple {
     >
     {
         using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = running_minmax_state<Element, std::greater>;
-        using coeffs_type = running_minmax_coeffs<Scalar>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using State  = running_minmax_state<Element, std::greater>;
+        using Coeffs = running_minmax_coeffs<Scalar>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
-        explicit running_max(int len) : base_type(len) {}
+        explicit running_max(int len) : Base(len) {}
     };
 
     template <typename Element>
@@ -46,11 +46,11 @@ namespace disiple {
     >
     {
         using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = running_range_state<Element>;
-        using coeffs_type = running_minmax_coeffs<Scalar>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using State  = running_range_state<Element>;
+        using Coeffs = running_minmax_coeffs<Scalar>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
-        explicit running_range(int len) : base_type(len) {}
+        explicit running_range(int len) : Base(len) {}
     };
 
 }

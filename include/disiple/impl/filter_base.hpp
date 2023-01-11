@@ -4,7 +4,7 @@
 
 namespace disiple {
 
-    enum dry_run_t { dry_run };
+    enum DryRun { dry_run };
 
     template <typename Element,
               typename State, typename Coeffs,
@@ -85,7 +85,7 @@ namespace disiple {
         /// Apply filter, but discard output, just update filter state
         /// @param x Input array, channels-by-time
         template <typename X>
-        void apply(const Eigen::ArrayBase<X>& x, dry_run_t)
+        void apply(const Eigen::ArrayBase<X>& x, DryRun)
         {
             state_.setup(coeffs_, static_cast<int>(x.rows()));
             for (Eigen::DenseIndex i=0; i<x.cols(); ++i)
@@ -143,40 +143,40 @@ namespace disiple {
         >::type>
         : public filter_base<Eigen::Array<Scalar, 1, 1>, State, Coeffs>
     {
-        using array_t = Eigen::Array<Scalar, 1, 1>;
-        using map_t   = Eigen::Map<array_t>;
-        using base_t  = filter_base<array_t, State, Coeffs>;
+        using Array = Eigen::Array<Scalar, 1, 1>;
+        using Map   = Eigen::Map<Array>;
+        using Base  = FilterBase<Array, State, Coeffs>;
 
     protected:
         template <typename... Args>
-        explicit filter_base(Args&&... args) : base_t(std::forward<Args>(args)...) {}
+        explicit filter_base(Args&&... args) : Base(std::forward<Args>(args)...) {}
 
-        using base_t::state;
-        using base_t::coeffs;
+        using Base::state;
+        using Base::coeffs;
 
     public:
-        using base_t::initialize;
+        using Base::initialize;
 
         Scalar operator()(Scalar x)
         {
             Scalar y;
-            base_t::apply(map_t(&x), map_t(&y));
+            Base::apply(Map(&x), Map(&y));
             return y;
         }
 
         void apply(Scalar x)
         {
-            base_t::apply(map_t(&x));
+            Base::apply(Map(&x));
         }
 
         void apply(Scalar x, Scalar& y)
         {
-            base_t::apply(map_t(&x), map_t(&y));
+            Base::apply(Map(&x), Map(&y));
         }
 
-        void apply(Scalar x, dry_run_t)
+        void apply(Scalar x, DryRun)
         {
-            base_t::apply(map_t(&x), dry_run);
+            Base::apply(Map(&x), dry_run);
         }
     };
 
@@ -205,7 +205,7 @@ namespace disiple {
             >::type>
     {
         enum { Channels = 1 };
-        typedef T Scalar;
+        using Scalar = T;
     };
 
 

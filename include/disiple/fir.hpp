@@ -14,20 +14,20 @@ namespace disiple {
         >
     {
         enum { Channels = element_traits<Element>::Channels };
-        using Scalar      = typename element_traits<Element>::Scalar;
-        using state_type  = fir_state<Scalar, Length, Channels>;
-        using coeffs_type = fir_coeffs<Scalar, Length>;
-        using base_type   = filter_base<Element, state_type, coeffs_type>;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using State  = fir_state<Scalar, Length, Channels>;
+        using Coeffs = fir_coeffs<Scalar, Length>;
+        using Base   = filter_base<Element, State, Coeffs>;
 
         fir() {}
 
-        fir(fir_design d) : base_type(std::move(d)) {}
+        fir(fir_design d) : Base(std::move(d)) {}
 
         template <typename A>
-        fir(const Eigen::ArrayBase<A>& a) : base_type(a) {}
+        fir(const Eigen::ArrayBase<A>& a) : Base(a) {}
 
-        int length() const { return base_type::coeffs().length(); }
-        using base_type::coeffs;
+        int length() const { return Base::coeffs().length(); }
+        using Base::coeffs;
     };
 
 }

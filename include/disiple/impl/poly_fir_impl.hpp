@@ -10,13 +10,13 @@ namespace disiple {
     template <typename Scalar, int Length, int Stages, int J, int K>
     struct poly_fir_coeffs : mavg_coeffs<Scalar, Length, Stages>
     {
-        using base_type = mavg_coeffs<Scalar, Length, Stages>;
+        using Base = mavg_coeffs<Scalar, Length, Stages>;
 
         poly_fir_coeffs() {}
 
         template <typename P, typename Q>
         explicit poly_fir_coeffs(const Eigen::ArrayBase<P>& p, const Eigen::ArrayBase<Q>& q, int wlen) :
-            base_type(wlen, p.rows()), p_(p), q_(q)
+            Base(wlen, p.rows()), p_(p), q_(q)
         {}
 
         template <typename A>
@@ -39,7 +39,7 @@ namespace disiple {
     template <typename Scalar, int Length, int Channels, int Stages>
     struct poly_fir_state : fir_state<Scalar, Length, Channels>
     {
-        using base_type = fir_state<Scalar, Length, Channels>;
+        using Base = fir_state<Scalar, Length, Channels>;
 
         poly_fir_state() : num_(0)
         {
@@ -51,10 +51,10 @@ namespace disiple {
         void setup(const poly_fir_coeffs<Scalar, Length, Stages, J, K>& coeffs, int nchans)
         {
             const int len = coeffs.length();
-            if (base_type::num_chans() != nchans ||
-                base_type::length()    != len)
+            if (Base::num_chans() != nchans ||
+                Base::length()    != len)
             {
-                base_type::buf_.resize(nchans, len);
+                Base::buf_.resize(nchans, len);
                 sum_.resize(nchans, coeffs.stages());
                 a_.resize(coeffs.stages());
                 initialize();
@@ -63,7 +63,7 @@ namespace disiple {
 
         void initialize()
         {
-            base_type::initialize();
+            Base::initialize();
             sum_.fill(0); num_ = 0; a_.fill(0);
         }
 
@@ -99,9 +99,9 @@ namespace disiple {
                 xi += a_[i] * (sum_.col(i) += sum_.col(i-1));
         }
 
-        using base_type::advance;
-        using base_type::buf_;
-        using base_type::pos_;
+        using Base::advance;
+        using Base::buf_;
+        using Base::pos_;
         Eigen::Array<Scalar, Channels, Stages>      sum_;
         Eigen::Array<Scalar, Stages, 1>             a_;
         int                                         num_;
