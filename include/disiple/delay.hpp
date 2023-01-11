@@ -2,18 +2,28 @@
 
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/delay_impl.hpp>
+#include <disiple/named_params.hpp>
+
 
 namespace disiple {
 
-    template <typename Scalar, int Length = Eigen::Dynamic, int Channels = 1>
-    struct Delay : public FilterBase<Scalar, Channels,
-        DelayState<Scalar, Length, Channels>,
-        DelayCoeffs<Scalar, Length>
+    template <typename... Options>
+    using DelayParameters = Parameters<
+        List<Options...>,
+        OptionalValue<int, Length, Eigen::Dynamic>,
+        OptionalValue<int, Channels, 1>
+    >;
+
+    template <typename Scalar, typename... Options>
+    struct Delay : public FilterBase<Scalar, DelayParameters<Options...>::channels,
+        DelayState <Scalar, DelayParameters<Options...>::length, DelayParameters<Options...>::channels>,
+        DelayCoeffs<Scalar, DelayParameters<Options...>::length>
     >
     {
-        using State  = DelayState<Scalar, Length, Channels>;
-        using Coeffs = DelayCoeffs<Scalar, Length>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using P      = DelayParameters<Options...>;
+        using State  = DelayState<Scalar, P::length, P::channels>;
+        using Coeffs = DelayCoeffs<Scalar, P::length>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         Delay() {}
         explicit Delay(int length) : Base(length) {}

@@ -2,6 +2,11 @@
 
 namespace disiple {
 
+    // some common named parameters
+    template <int N> struct Channels { enum { channels = N }; };
+    template <int N> struct Stages   { enum { stages = N }; };
+    template <int N> struct Length   { enum { length = N }; };
+
     // See test/named_params.cpp for usage
     template <typename ListArgs, typename... Params>
     struct Parameters;

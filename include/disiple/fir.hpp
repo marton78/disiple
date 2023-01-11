@@ -3,19 +3,28 @@
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/fir_impl.hpp>
 #include <disiple/filter_design.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
+    template <typename... Options>
+    using FIRParameters = Parameters<
+        List<Options...>,
+        OptionalValue<int, Length, Eigen::Dynamic>,
+        OptionalValue<int, Channels, 1>
+    >;
+
     /// Finite impulse response (FIR) digital filter
-    template <typename Scalar, int Length = Eigen::Dynamic, int Channels = 1>
-    struct FIR : public FilterBase<Scalar, Channels,
-            FIRState<Scalar, Length, Channels>,
-            FIRCoeffs<Scalar, Length>
+    template <typename Scalar, typename... Options>
+    struct FIR : public FilterBase<Scalar, FIRParameters<Options...>::channels,
+            FIRState <Scalar, FIRParameters<Options...>::length, FIRParameters<Options...>::channels>,
+            FIRCoeffs<Scalar, FIRParameters<Options...>::length>
         >
     {
-        using State  = FIRState<Scalar, Length, Channels>;
-        using Coeffs = FIRCoeffs<Scalar, Length>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using P      = FIRParameters<Options...>;
+        using State  = FIRState<Scalar, P::length, P::channels>;
+        using Coeffs = FIRCoeffs<Scalar, P::length>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         FIR() {}
 

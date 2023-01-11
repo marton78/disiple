@@ -3,8 +3,16 @@
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/poly_fir_impl.hpp>
 #include <disiple/filter_design.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
+
+    template <typename... Options>
+    using PolynomialFIRParameters = Parameters<
+        List<Options...>,
+        OptionalValue<int, Length, Eigen::Dynamic>,
+        OptionalValue<int, Channels, 1>
+    >;
 
     /// Polynomial FIR filter.
     /// A polynomial filter's weights are given by
@@ -12,15 +20,16 @@ namespace disiple {
     /// where the $a_i$ are rational functions of the window length T:
     ///     $$ a_i = \sum_j p_ij n^j / \sum_k q_ik n^k $$
     /// with $t \in [1, T]$, $i \in [0, I)$, $j \in [0, J)$ and $k \in [0, K)$.
-    template <typename Scalar, int I, int J, int K, int Length = Eigen::Dynamic, int Channels = 1>
-    struct PolynomialFIR : public FilterBase<Scalar, Channels,
-        PolyFIRState<Scalar, Length, Channels, I>,
-        PolyFIRCoeffs<Scalar, Length, I, J, K>
+    template <typename Scalar, int I, int J, int K, typename... Options>
+    struct PolynomialFIR : public FilterBase<Scalar, PolynomialFIRParameters<Options...>::channels,
+        PolyFIRState <Scalar, PolynomialFIRParameters<Options...>::length, PolynomialFIRParameters<Options...>::channels, I>,
+        PolyFIRCoeffs<Scalar, PolynomialFIRParameters<Options...>::length, I, J, K>
     >
     {
-        using State  = PolyFIRState<Scalar, Length, Channels, I>;
-        using Coeffs = PolyFIRCoeffs<Scalar, Length, I, J, K>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using P      = PolynomialFIRParameters<Options...>;
+        using State  = PolyFIRState<Scalar, P::length, P::channels, I>;
+        using Coeffs = PolyFIRCoeffs<Scalar, P::length, I, J, K>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         PolynomialFIR() {}
 

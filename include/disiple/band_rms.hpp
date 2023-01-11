@@ -1,6 +1,7 @@
 #pragma once
 
 #include <disiple/impl/filter_base.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
@@ -13,15 +14,23 @@ namespace disiple {
     /// e.g. BandRMS<Array4f, iir<Array4f, 4>, moving_average<Array4f> >
     /// See: http://en.wikipedia.org/wiki/Root_mean_square#RMS_of_common_waveforms
 
-    template <typename Scalar, typename Bandpass, typename Expectation, int Channels = 1>
-    struct BandRMS : public FilterBase<Scalar, Channels,
+    template <typename... Options>
+    using BandRMSParameters = Parameters<
+        List<Options...>,
+        OptionalValue<int, Channels, 1>
+    >;
+
+    template <typename Scalar, typename Bandpass, typename Expectation, typename... Options>
+    struct BandRMS : public FilterBase<Scalar,
+        BandRMSParameters<Options...>::channels,
         BandRMSState <Scalar, Bandpass, Expectation>,
         BandRMSCoeffs<Scalar, Bandpass, Expectation>
     >
     {
+        using P      = BandRMSParameters<Options...>;
         using State  = BandRMSState <Scalar, Bandpass, Expectation>;
         using Coeffs = BandRMSCoeffs<Scalar, Bandpass, Expectation>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         BandRMS() {}
 

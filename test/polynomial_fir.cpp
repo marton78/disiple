@@ -39,7 +39,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
 
         // M = phi * phi' \ phi
         Matrix<Scalar, 2, Dynamic> M = (phi*phi.transpose()).ldlt().solve(phi);
-        FIR<Scalar, Eigen::Dynamic, nchan> f = M.row(1).array();
+        FIR<Scalar, Channels<nchan>> f = M.row(1).array();
 
         // Determined by examining the least squares matrix A*A'\A:
         // When fitting a line ax+b to some values X,
@@ -57,7 +57,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
         Q << 0, -1, 0, 1,   // x^0
              0, -1, 0, 1;   // x^1
 
-        PolynomialFIR<Scalar, 2, 2, 4, Eigen::Dynamic, nchan> p(P, Q, wlen);
+        PolynomialFIR<Scalar, 2, 2, 4, Channels<nchan>> p(P, Q, wlen);
 
         Array<Scalar, nchan, Dynamic> y(nchan, ndata), z(nchan, ndata);
         for (size_t t=0; t<ndata; ++t)

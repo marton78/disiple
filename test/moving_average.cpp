@@ -20,9 +20,9 @@ TEMPLATE_TEST_CASE_SIG("Moving Average Filter", "[running_stats]",
 ) {
     const int W = 10; // Window length of the filter
 
-    disiple::MovingAverage<Scalar, Dynamic, 1, NChan> rmean1(W);
-    disiple::MovingAverage<Scalar, Dynamic, 2, NChan> rmean2(W);
-    disiple::MovingAverage<Scalar, Dynamic, 3, NChan> rmean3(W);
+    disiple::MovingAverage<Scalar, Stages<1>, Channels<NChan>> rmean1(W);
+    disiple::MovingAverage<Scalar, Stages<2>, Channels<NChan>> rmean2(W);
+    disiple::MovingAverage<Scalar, Stages<3>, Channels<NChan>> rmean3(W);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
     Array<Scalar, nchan, 1> y1, y2, y3, z;

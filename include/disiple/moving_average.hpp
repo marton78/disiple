@@ -2,18 +2,28 @@
 
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/mavg_impl.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
-    template <typename Scalar, int Length = Eigen::Dynamic, int Stages = 1, int Channels = 1>
-    struct MovingAverage : public FilterBase<Scalar, Channels,
-        MAvgState<Scalar, Length, Channels, Stages>,
-        MAvgCoeffs<Scalar, Length, Stages>
+    template <typename... Options>
+    using MovingAverageParameters = Parameters<
+        List<Options...>,
+        OptionalValue<int, Length, Eigen::Dynamic>,
+        OptionalValue<int, Stages, 1>,
+        OptionalValue<int, Channels, 1>
+    >;
+
+    template <typename Scalar, typename... Options>
+    struct MovingAverage : public FilterBase<Scalar, MovingAverageParameters<Options...>::channels,
+        MAvgState <Scalar, MovingAverageParameters<Options...>::length, MovingAverageParameters<Options...>::channels, MovingAverageParameters<Options...>::stages>,
+        MAvgCoeffs<Scalar, MovingAverageParameters<Options...>::length, MovingAverageParameters<Options...>::stages>
     >
     {
-        using State  = MAvgState<Scalar, Length, Channels, Stages>;
-        using Coeffs = MAvgCoeffs<Scalar, Length, Stages>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using P      = MovingAverageParameters<Options...>;
+        using State  = MAvgState <Scalar, P::length, P::channels, P::stages>;
+        using Coeffs = MAvgCoeffs<Scalar, P::length, P::stages>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         MovingAverage() {}
         explicit MovingAverage(int length) : Base(length) {}

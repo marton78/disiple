@@ -4,19 +4,32 @@
 #include <disiple/impl/iir_sos.hpp>
 #include <disiple/impl/iir_impl.hpp>
 #include <disiple/filter_design.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
+    template <IIRImplementation N>
+    struct Implementation { static constexpr IIRImplementation implementation = N; };
+
+    template <typename... Options>
+    using IIRParameters = Parameters<
+        List<Options...>,
+        OptionalValue<IIRImplementation, Implementation, DF2T>,
+        OptionalValue<int, Stages, Eigen::Dynamic>,
+        OptionalValue<int, Channels, 1>
+    >;
+
     /// Infinite impulse response (IIR) digital filter
-    template <typename Scalar, int Stages = Eigen::Dynamic, IIRImplementation Type = DF2T, int Channels = 1>
-    struct IIR : public FilterBase<Scalar, Channels,
-            IIRImpl<Scalar, Stages, Channels, Type>,
-            SecondOrderSections<Scalar, Stages>
+    template <typename Scalar, typename... Options>
+    struct IIR : public FilterBase<Scalar, IIRParameters<Options...>::channels,
+            IIRImpl<Scalar, IIRParameters<Options...>::stages, IIRParameters<Options...>::channels, IIRParameters<Options...>::implementation>,
+            SecondOrderSections<Scalar, IIRParameters<Options...>::stages>
         >
     {
-        using State  = IIRImpl<Scalar, Stages, Channels, Type>;
-        using Coeffs = SecondOrderSections<Scalar, Stages>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
+        using P      = IIRParameters<Options...>;
+        using State  = IIRImpl<Scalar, P::stages, P::channels, P::implementation>;
+        using Coeffs = SecondOrderSections<Scalar, P::stages>;
+        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         IIR() {}
         IIR(const IIRDesign &d) : Base(d) {}

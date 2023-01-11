@@ -21,13 +21,13 @@ TEMPLATE_TEST_CASE_SIG("Running Bandpass Root Mean Square", "[running_stats]",
     (float, Dynamic), (double, Dynamic),
     (float, nchan),   (double, nchan)
 ) {
-    using BPFilter    = IIR<Scalar, 4, DF2T, NChan>;
-    using Expectation = MovingAverage<Scalar, Eigen::Dynamic, 1, NChan>;
+    using BPFilter    = IIR<Scalar, Stages<4>, Channels<NChan>>;
+    using Expectation = MovingAverage<Scalar, Channels<NChan>>;
 
     IIRDesign bandpass_design(butterworth(4), Bandpass(.1, .2));
     int expectation_design = 10;
 
-    BandRMS<Scalar, BPFilter, Expectation, NChan> brms(bandpass_design, expectation_design);
+    BandRMS<Scalar, BPFilter, Expectation, Channels<NChan>> brms(bandpass_design, expectation_design);
 
     BPFilter     bp(bandpass_design);
     Expectation  ex(expectation_design);

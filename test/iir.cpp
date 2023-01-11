@@ -158,7 +158,7 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
 ) {
     const TestFixtureIIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = IIR<Scalar, DynOrder ? Dynamic : 2, Type, NChan>;
+    using Filter = IIR<Scalar, Stages<DynOrder ? Dynamic : 2>, Implementation<Type>, Channels<NChan>>;
 
     const size_t             ndesign = DynOrder ? ndyn_design : nstat_design;
     const IIRDesign* const*  designs = DynOrder ? fix.dyn_designs : fix.stat_designs;
@@ -215,13 +215,13 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of arrays", "[iir]",
         Array<Scalar, Dynamic, Dynamic> x = fix.raw_data.colwise() + x0;
 
         // For a lowpass filter, we expect the output to contain the offset x0
-        IIR<Scalar, DynOrder ? Dynamic : 2, Type, NChan> flp(fix.dlp); flp.initialize(x0);
+        IIR<Scalar, Stages<DynOrder ? Dynamic : 2>, Implementation<Type>, Channels<NChan>> flp(fix.dlp); flp.initialize(x0);
         flp.apply(x, y);
         Scalar maxdev_lp = (fix.mlp_data.colwise() + x0 - y).abs().maxCoeff();
         REQUIRE( maxdev_lp <= threshold<Scalar>() );
 
         // For a bandpass filter, we expect that the offset is removed
-        IIR<Scalar, DynOrder ? Dynamic : 3, Type, NChan> fbp(fix.dbp); fbp.initialize(x0);
+        IIR<Scalar, Stages<DynOrder ? Dynamic : 3>, Implementation<Type>, Channels<NChan>> fbp(fix.dbp); fbp.initialize(x0);
         fbp.apply(x, y);
         Scalar maxdev_bp = (fix.mbp_data - y).abs().maxCoeff();
         REQUIRE( maxdev_bp <= threshold<Scalar>() );
@@ -238,7 +238,7 @@ TEMPLATE_TEST_CASE_SIG("IIR Filter of scalars", "[iir]",
 ) {
     const TestFixtureIIR<Scalar> fix;
     Array<Scalar, 1, Dynamic> y(ndata);
-    using Filter = IIR<Scalar, Dynamic, Type, 1>;
+    using Filter = IIR<Scalar, Implementation<Type>>;
 
     const size_t            ndesign = DynOrder ? ndyn_design : nstat_design;
     const IIRDesign* const* designs = DynOrder ? fix.dyn_designs : fix.stat_designs;

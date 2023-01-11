@@ -38,12 +38,12 @@ TEMPLATE_TEST_CASE_SIG("Delay filter", "[delay]",
     (float,  nchan,   false), (double, nchan,   false), (int, nchan,   false)
 ) {
     TestFixtureDelay<Scalar> fix;
-    enum { Length = TestFixtureDelay<Scalar>::Length };
+    enum { N = TestFixtureDelay<Scalar>::Length };
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = Delay<Scalar, DynLength ? Dynamic : Length, NChan>;
+    using Filter = Delay<Scalar, Length<DynLength ? Dynamic : N>, Channels<NChan>>;
 
     SECTION("in_place", "Delay filter applied in place") {
-        Filter f(Length);
+        Filter f(N);
         y = fix.raw_data;
         f.apply(y.block(0,  0, nchan,       10));
         f.apply(y.block(0, 10, nchan, ndata-10));
@@ -52,7 +52,7 @@ TEMPLATE_TEST_CASE_SIG("Delay filter", "[delay]",
     }
 
     SECTION("to_other", "FIR filter applied into another array") {
-        Filter f(Length);
+        Filter f(N);
         f.apply(fix.raw_data.block(0,  0, nchan,       10), y.block(0,  0, nchan,       10));
         f.apply(fix.raw_data.block(0, 10, nchan, ndata-10), y.block(0, 10, nchan, ndata-10));
         Scalar maxdev = (fix.ref_data - y).abs().maxCoeff();
@@ -60,7 +60,7 @@ TEMPLATE_TEST_CASE_SIG("Delay filter", "[delay]",
     }
 
     SECTION("update_only", "FIR filter state updated without applying it") {
-        Filter f(Length);
+        Filter f(N);
         y = fix.raw_data;
         f.apply(y.block(0,  0, nchan,       10), dry_run);
         f.apply(y.block(0, 10, nchan, ndata-10));

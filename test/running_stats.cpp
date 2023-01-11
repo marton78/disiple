@@ -22,9 +22,9 @@ TEMPLATE_TEST_CASE_SIG("Running Min, Max and Range", "[running_stats]",
 ) {
     const int W = 10; // Window length of the filter
 
-    disiple::RunningMin  <Scalar, NChan> fmin(W);
-    disiple::RunningMax  <Scalar, NChan> fmax(W);
-    disiple::RunningRange<Scalar, NChan> frng(W);
+    disiple::RunningMin  <Scalar, Channels<NChan>> fmin(W);
+    disiple::RunningMax  <Scalar, Channels<NChan>> fmax(W);
+    disiple::RunningRange<Scalar, Channels<NChan>> frng(W);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
     Array<Scalar, nchan, 1> ymin, ymax, yrng, zmin, zmax, zrng;
