@@ -9,7 +9,7 @@ namespace disiple {
     static const double pi      = 3.1415926535897932384626433832795028841971;
     static const double two_pi  = pi * 2.0;
     static const double pi_half = pi * 0.5;
-    typedef std::complex<double> complex_t;
+    using complex_t = std::complex<double>;
 
     struct complex_pair : std::pair<complex_t, complex_t>
     {

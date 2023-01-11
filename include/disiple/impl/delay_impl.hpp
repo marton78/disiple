@@ -28,7 +28,7 @@ namespace disiple {
     template <typename Scalar, int Length, int Channels>
     struct delay_state : fir_state<Scalar, Length, Channels>
     {
-        typedef fir_state<Scalar, Length, Channels> base_type;
+        using base_type = fir_state<Scalar, Length, Channels>;
 
         delay_state() : base_type() {}
 

@@ -21,10 +21,10 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef band_rms_state <Scalar, Bandpass, Expectation>  state_type;
-        typedef band_rms_coeffs<Scalar, Bandpass, Expectation>  coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = band_rms_state <Scalar, Bandpass, Expectation>;
+        using coeffs_type = band_rms_coeffs<Scalar, Bandpass, Expectation>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         band_rms() {}
 
@@ -54,7 +54,7 @@ namespace disiple {
     template <typename Scalar, typename Bandpass, typename Expectation>
     struct band_rms_state
     {
-        typedef band_rms_coeffs<Scalar, Bandpass, Expectation> coeffs_type;
+        using coeffs_type = band_rms_coeffs<Scalar, Bandpass, Expectation>;
 
         void setup(const coeffs_type& coeffs, int nchans)
         {

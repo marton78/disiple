@@ -28,8 +28,8 @@ namespace disiple {
     struct running_minmax_state
     {
         enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar  Scalar;
-        typedef running_minmax_coeffs<Scalar>             Coeffs;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using Coeffs = running_minmax_coeffs<Scalar>;
 
         running_minmax_state()
         {
@@ -98,7 +98,7 @@ namespace disiple {
             process_result([] (Scalar src, Scalar& dst) { dst = src; }, xi);
         }
 
-        typedef std::deque<std::pair<size_t, Scalar>> buf_t;
+        using buf_t = std::deque<std::pair<size_t, Scalar>>;
         Eigen::Array<buf_t, Channels, 1> bufs_;
         int length_;
     };
@@ -107,8 +107,8 @@ namespace disiple {
     template <typename Element>
     struct running_range_state
     {
-        typedef typename element_traits<Element>::Scalar  Scalar;
-        typedef running_minmax_coeffs<Scalar>             Coeffs;
+        using Scalar = typename element_traits<Element>::Scalar;
+        using Coeffs = running_minmax_coeffs<Scalar>;
 
         void setup(const Coeffs& coeffs, int nchans)
         {

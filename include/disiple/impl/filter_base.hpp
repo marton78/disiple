@@ -143,9 +143,9 @@ namespace disiple {
         >::type>
         : public filter_base<Eigen::Array<Scalar, 1, 1>, State, Coeffs>
     {
-        typedef Eigen::Array<Scalar, 1, 1>                 array_t;
-        typedef Eigen::Map<array_t>                        map_t;
-        typedef filter_base<array_t, State, Coeffs>        base_t;
+        using array_t = Eigen::Array<Scalar, 1, 1>;
+        using map_t   = Eigen::Map<array_t>;
+        using base_t  = filter_base<array_t, State, Coeffs>;
 
     protected:
         template <typename... Args>
@@ -196,7 +196,7 @@ namespace disiple {
         static_assert(Eigen::internal::traits<T>::ColsAtCompileTime == 1,
                       "This class is for vectors only");
         enum { Channels = Eigen::internal::traits<T>::RowsAtCompileTime };
-        typedef typename T::Scalar Scalar;
+        using Scalar = typename T::Scalar;
     };
 
     template <typename T>

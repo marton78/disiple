@@ -37,7 +37,7 @@ namespace disiple {
     // notch
     void iir_design::add_notch(double Wo, double BW)
     {
-        typedef std::complex<double> complex_t;
+        using complex_t = std::complex<double>;
 
         const double gain = 1.0/(1.0+tan(0.5*BW*pi));
         const double w = Wo*pi;
@@ -65,7 +65,7 @@ namespace disiple {
     {
         iir_design result;
 
-        typedef std::complex<double> complex_t;
+        using complex_t = std::complex<double>;
 
         const double gain = 1.0/(1.0+tan(0.25*N*BW*pi));
 

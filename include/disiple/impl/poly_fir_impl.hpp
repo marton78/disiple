@@ -10,7 +10,7 @@ namespace disiple {
     template <typename Scalar, int Length, int Stages, int J, int K>
     struct poly_fir_coeffs : mavg_coeffs<Scalar, Length, Stages>
     {
-        typedef mavg_coeffs<Scalar, Length, Stages> base_type;
+        using base_type = mavg_coeffs<Scalar, Length, Stages>;
 
         poly_fir_coeffs() {}
 
@@ -39,7 +39,7 @@ namespace disiple {
     template <typename Scalar, int Length, int Channels, int Stages>
     struct poly_fir_state : fir_state<Scalar, Length, Channels>
     {
-        typedef fir_state<Scalar, Length, Channels> base_type;
+        using base_type = fir_state<Scalar, Length, Channels>;
 
         poly_fir_state() : num_(0)
         {

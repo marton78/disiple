@@ -19,10 +19,10 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef poly_fir_state<Scalar, Length, Channels, I>     state_type;
-        typedef poly_fir_coeffs<Scalar, Length, I, J, K>        coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = poly_fir_state<Scalar, Length, Channels, I>;
+        using coeffs_type = poly_fir_coeffs<Scalar, Length, I, J, K>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         polynomial_fir() {}
 

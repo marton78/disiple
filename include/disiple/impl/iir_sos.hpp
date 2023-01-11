@@ -12,8 +12,8 @@ namespace disiple {
     class second_order_sections
     {
     public:
-        typedef Eigen::Array<Scalar, 4, Stages>    coeffs_t;
-        typedef typename coeffs_t::ConstColXpr     column_t;
+        using coeffs_t = Eigen::Array<Scalar, 4, Stages>;
+        using column_t = typename coeffs_t::ConstColXpr;
 
         second_order_sections() : scaling_(1) { coeffs_.setZero(); }
         second_order_sections(const iir_design& l);
@@ -87,7 +87,7 @@ namespace disiple {
     template <typename Scalar, int Stages>
     std::complex<Scalar> second_order_sections<Scalar, Stages>::response(Scalar f) const
     {
-        typedef std::complex<Scalar> complex_t;
+        using complex_t = std::complex<Scalar>;
 
         const complex_t czn1(std::cos(-f), std::sin(-f));
         const complex_t czn2(std::cos(-Scalar(2)*f), std::sin(-Scalar(2)*f));

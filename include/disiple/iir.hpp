@@ -15,10 +15,10 @@ namespace disiple {
         >
     {
         enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef iir_impl<Scalar, Stages, Channels, Type>        state_type;
-        typedef second_order_sections<Scalar, Stages>           coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = iir_impl<Scalar, Stages, Channels, Type>;
+        using coeffs_type = second_order_sections<Scalar, Stages>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         iir() {}
         iir(const iir_design &d) : base_type(d) {}

@@ -20,7 +20,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
 {
     using Scalar = TestType;
     
-    typedef Array<Scalar, nchan, 1> arrc;
+    using arrc = Array<Scalar, nchan, 1>;
 
     // data is channels x time
     Array<Scalar, nchan, Dynamic>  raw_data(nchan, ndata);

@@ -12,10 +12,10 @@ namespace disiple {
     >
     {
         enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef delay_state<Scalar, Length, Channels>           state_type;
-        typedef delay_coeffs<Scalar, Length>                    coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = delay_state<Scalar, Length, Channels>;
+        using coeffs_type = delay_coeffs<Scalar, Length>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         delay() {}
         explicit delay(int length) : base_type(length) {}

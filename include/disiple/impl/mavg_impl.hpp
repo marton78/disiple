@@ -62,7 +62,7 @@ namespace disiple {
     {
         enum { Rows = multiply_extents<Channels, Stages>::value };
 
-        typedef fir_state<Scalar, Length, Rows> base_type;
+        using base_type = fir_state<Scalar, Length, Rows>;
 
         mavg_state() : num_(0), correct_num_(0)
         {

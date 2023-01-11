@@ -16,7 +16,7 @@ namespace internal {
         if (z.size() != f.size())
             throw std::runtime_error("Make sure z has the same size as f.");
 
-        typedef std::complex<Scalar> complex_t;
+        using complex_t = std::complex<Scalar>;
 
         Array<complex_t, Dynamic, 1> czn1(f.size()), czn2(f.size());
 

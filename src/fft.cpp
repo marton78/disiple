@@ -2,8 +2,8 @@
 
 // these typedefs must come before including Accelerate.h,
 // because Accelerate redefines std::complex
-typedef std::complex<float>  cf;
-typedef std::complex<double> cd;
+using cf = std::complex<float>;
+using cd = std::complex<double>;
 
 #if USE_ACCELERATE
 #    include <Accelerate/Accelerate.h>

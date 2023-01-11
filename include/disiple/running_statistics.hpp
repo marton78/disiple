@@ -17,10 +17,10 @@ namespace disiple {
         running_minmax_coeffs<typename element_traits<Element>::Scalar>
     >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_minmax_state<Element, std::less>        state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = running_minmax_state<Element, std::less>;
+        using coeffs_type = running_minmax_coeffs<Scalar>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         explicit running_min(int len) : base_type(len) {}
     };
@@ -31,10 +31,10 @@ namespace disiple {
         running_minmax_coeffs<typename element_traits<Element>::Scalar>
     >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_minmax_state<Element, std::greater>     state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = running_minmax_state<Element, std::greater>;
+        using coeffs_type = running_minmax_coeffs<Scalar>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         explicit running_max(int len) : base_type(len) {}
     };
@@ -45,10 +45,10 @@ namespace disiple {
         running_minmax_coeffs<typename element_traits<Element>::Scalar>
     >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_range_state<Element>                    state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+        using Scalar      = typename element_traits<Element>::Scalar;
+        using state_type  = running_range_state<Element>;
+        using coeffs_type = running_minmax_coeffs<Scalar>;
+        using base_type   = filter_base<Element, state_type, coeffs_type>;
 
         explicit running_range(int len) : base_type(len) {}
     };
