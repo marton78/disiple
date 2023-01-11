@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/fir.hpp>
 #include <disiple/polynomial_fir.hpp>
 #include <cstdlib>

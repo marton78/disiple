@@ -16,7 +16,6 @@ set(LIB_SOURCES
 )
 
 set(TEST_SOURCES
-    test/main.cpp
     test/iir.cpp
     test/polynomial_fir.cpp
     test/band_rms.cpp

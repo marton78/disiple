@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/band_rms.hpp>
 #include <disiple/iir.hpp>
 #include <disiple/moving_average.hpp>
