@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/impl/next_pow2.hpp>
 
 TEST_CASE("Next power of 2 of a uint32_t", "[next_pow2]")

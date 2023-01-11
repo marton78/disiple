@@ -6,18 +6,18 @@
 namespace disiple {
 
     template <typename Scalar, int Length>
-    struct delay_coeffs
+    struct DelayCoeffs
     {
-        explicit delay_coeffs(int n = Length)
+        explicit DelayCoeffs(int n = Length)
         { assert(n == Length); }
 
         static int length() { return Length; }
     };
 
     template <typename Scalar>
-    struct delay_coeffs<Scalar, Eigen::Dynamic>
+    struct DelayCoeffs<Scalar, Eigen::Dynamic>
     {
-        explicit delay_coeffs(int n = 0)
+        explicit DelayCoeffs(int n = 0)
         : length_(n) {}
 
         int length() const { return length_; }
@@ -26,23 +26,23 @@ namespace disiple {
     };
 
     template <typename Scalar, int Length, int Channels>
-    struct delay_state : fir_state<Scalar, Length, Channels>
+    struct DelayState : FIRState<Scalar, Length, Channels>
     {
-        typedef fir_state<Scalar, Length, Channels> base_type;
+        using Base = FIRState<Scalar, Length, Channels>;
 
-        delay_state() : base_type() {}
+        DelayState() : Base() {}
 
-        using base_type::initialize;
-        using base_type::advance;
+        using Base::initialize;
+        using Base::advance;
 
-        void setup(const delay_coeffs<Scalar, Length>& coeffs, int nchans)
+        void setup(const DelayCoeffs<Scalar, Length>& coeffs, int nchans)
         {
-            base_type::setup(coeffs, nchans);
+            Base::setup(coeffs, nchans);
             prev_.resize(nchans);
         }
 
         template <typename X>
-        void apply(const delay_coeffs<Scalar, Length>& coeffs,
+        void apply(const DelayCoeffs<Scalar, Length>& coeffs,
                    Eigen::ArrayBase<X>& xi)
         {
             advance();
@@ -52,16 +52,16 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const delay_coeffs<Scalar, Length>& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+        void apply(const DelayCoeffs<Scalar, Length>& coeffs,
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             advance();
             buf_.col(pos_) = xi;
         }
 
         Eigen::Array<Scalar, Channels, 1> prev_;
-        using base_type::buf_;
-        using base_type::pos_;
+        using Base::buf_;
+        using Base::pos_;
     };
 
 }

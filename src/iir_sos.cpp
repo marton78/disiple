@@ -16,29 +16,29 @@ namespace internal {
         if (z.size() != f.size())
             throw std::runtime_error("Make sure z has the same size as f.");
 
-        typedef std::complex<Scalar> complex_t;
+        using Complex = std::complex<Scalar>;
 
-        Array<complex_t, Dynamic, 1> czn1(f.size()), czn2(f.size());
+        Array<Complex, Dynamic, 1> czn1(f.size()), czn2(f.size());
 
         czn1.real() = (-Scalar(pi) * f).cos();
         czn1.imag() = (-Scalar(pi) * f).sin();
         czn2.real() = (-Scalar(two_pi) * f).cos();
         czn2.imag() = (-Scalar(two_pi) * f).sin();
 
-        z.fill(complex_t(scaling));
+        z.fill(Complex(scaling));
 
         for (int i=0; i<coeffs.cols(); i++)
         {
             auto c = coeffs.col(i);
-            z *= (complex_t(1) + c[0] * czn1 + c[1] * czn2)
-               / (complex_t(1) - c[2] * czn1 - c[3] * czn2);
+            z *= (Complex(1) + c[0] * czn1 + c[1] * czn2)
+               / (Complex(1) - c[2] * czn1 - c[3] * czn2);
         }
     }
 
     template <typename Scalar>
     void biquad_from_pz_pair(Ref<Array<Scalar, 4, 1>, Aligned> c,
-                             complex_t pole1, complex_t zero1,
-                             complex_t pole2, complex_t zero2)
+                             Complex pole1, Complex zero1,
+                             Complex pole2, Complex zero2)
     {
         if (zero1.imag() != 0) { // zero2 == std::conj(zero1))
             c[0] = -Scalar(2 * zero1.real());
@@ -61,10 +61,10 @@ namespace internal {
 
     template
     void biquad_from_pz_pair<float> (Ref<Array4f, Aligned>,
-                                     complex_t, complex_t, complex_t, complex_t);
+                                     Complex, Complex, Complex, Complex);
     template
     void biquad_from_pz_pair<double>(Ref<Array4d, Aligned>,
-                                     complex_t, complex_t, complex_t, complex_t);
+                                     Complex, Complex, Complex, Complex);
 
     template
     void response<float>(Ref<const Array<float, 4, Dynamic>, Aligned, Stride<4, 1>>,

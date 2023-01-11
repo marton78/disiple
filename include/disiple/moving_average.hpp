@@ -2,41 +2,52 @@
 
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/mavg_impl.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
-    template <typename Element, int Length = Eigen::Dynamic, int Stages = 1>
-    struct moving_average : public filter_base<Element,
-        mavg_state<typename element_traits<Element>::Scalar, Length, element_traits<Element>::Channels, Stages>,
-        mavg_coeffs<typename element_traits<Element>::Scalar, Length, Stages>
-    >
+    template <typename Scalar, typename... Options>
+    class MovingAverage : public FilterBase<Scalar, MovingAverage<Scalar, Options...>>,
+                          public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Length, Eigen::Dynamic>,
+                                OptionalValue<int, Stages, 1>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef mavg_state<Scalar, Length, Channels, Stages>    state_type;
-        typedef mavg_coeffs<Scalar, Length, Stages>             coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State  = MAvgState <Scalar, MovingAverage::length, MovingAverage::channels, MovingAverage::stages>;
+        using Coeffs = MAvgCoeffs<Scalar, MovingAverage::length, MovingAverage::stages>;
 
-        moving_average() {}
-        explicit moving_average(int length) : base_type(length) {}
-        moving_average(int length, int stages) : base_type(length, stages) {}
+        MovingAverage() {}
+        explicit MovingAverage(int length) : coeffs_(length) {}
+        MovingAverage(int length, int stages) : coeffs_(length, stages) {}
+
+    private:
+        friend FilterBase<Scalar, MovingAverage<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 
-    template <typename Element>
-    struct cum_moving_average : public filter_base<Element,
-        cmavg_state<typename element_traits<Element>::Scalar, element_traits<Element>::Channels>,
-        cmavg_coeffs<typename element_traits<Element>::Scalar>
-    >
+    template <typename Scalar, typename... Options>
+    class CumMovingAverage : public FilterBase<Scalar, CumMovingAverage<Scalar, Options...>>,
+                             public Parameters<
+                                    List<Options...>,
+                                    OptionalValue<int, Channels, 1>
+                                >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef cmavg_state<Scalar, Channels>                   state_type;
-        typedef cmavg_coeffs<Scalar>                            coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State  = CumMAvgState<Scalar, CumMovingAverage::channels>;
+        using Coeffs = CumMAvgCoeffs<Scalar>;
 
-        cum_moving_average() {}
-        explicit cum_moving_average(int length) : base_type(length) {}
+        CumMovingAverage() {}
+        explicit CumMovingAverage(int length) : coeffs_(length) {}
+
+    private:
+        friend FilterBase<Scalar, CumMovingAverage<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

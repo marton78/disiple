@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/fir.hpp>
 #include <disiple/polynomial_fir.hpp>
 #include <cstdlib>
@@ -20,7 +20,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
 {
     using Scalar = TestType;
     
-    typedef Array<Scalar, nchan, 1> arrc;
+    using arrc = Array<Scalar, nchan, 1>;
 
     // data is channels x time
     Array<Scalar, nchan, Dynamic>  raw_data(nchan, ndata);
@@ -39,7 +39,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
 
         // M = phi * phi' \ phi
         Matrix<Scalar, 2, Dynamic> M = (phi*phi.transpose()).ldlt().solve(phi);
-        fir<arrc> f = M.row(1).array();
+        FIR<Scalar, Channels<nchan>> f = M.row(1).array();
 
         // Determined by examining the least squares matrix A*A'\A:
         // When fitting a line ax+b to some values X,
@@ -57,7 +57,7 @@ TEMPLATE_TEST_CASE("Polynomial FIR filter", "[fir_poly]", float, double)
         Q << 0, -1, 0, 1,   // x^0
              0, -1, 0, 1;   // x^1
 
-        polynomial_fir<arrc, 2, 2, 4> p(P, Q, wlen);
+        PolynomialFIR<Scalar, 2, 2, 4, Channels<nchan>> p(P, Q, wlen);
 
         Array<Scalar, nchan, Dynamic> y(nchan, ndata), z(nchan, ndata);
         for (size_t t=0; t<ndata; ++t)

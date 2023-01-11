@@ -2,6 +2,7 @@
 
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/running_stats_impl.hpp>
+#include <disiple/named_params.hpp>
 #include <deque>
 
 namespace disiple {
@@ -11,46 +12,64 @@ namespace disiple {
     /// More than Three Comparisons per Element”,
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
-    template <typename Element>
-    struct running_min : public filter_base<Element,
-        running_minmax_state<Element, std::less>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
-    >
+    template <typename Scalar, typename... Options>
+    class RunningMin : public FilterBase<Scalar, RunningMin<Scalar, Options...>>,
+                       public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_minmax_state<Element, std::less>        state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State  = RunningMinMaxState<Scalar, RunningMin::channels, std::less>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        friend FilterBase<Scalar, RunningMin<Scalar, Options...>>;
 
-        explicit running_min(int len) : base_type(len) {}
+        explicit RunningMin(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningMin<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
-    template <typename Element>
-    struct running_max : public filter_base<Element,
-        running_minmax_state<Element, std::greater>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
-    >
+    template <typename Scalar, typename... Options>
+    class RunningMax : public FilterBase<Scalar, RunningMax<Scalar, Options...>>,
+                       public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_minmax_state<Element, std::greater>     state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State  = RunningMinMaxState<Scalar, RunningMax::channels, std::greater>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        friend FilterBase<Scalar, RunningMax<Scalar, Options...>>;
 
-        explicit running_max(int len) : base_type(len) {}
+        explicit RunningMax(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningMax<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
-    template <typename Element>
-    struct running_range : public filter_base<Element,
-        running_range_state<Element>,
-        running_minmax_coeffs<typename element_traits<Element>::Scalar>
-    >
+    template <typename Scalar, typename... Options>
+    class RunningRange : public FilterBase<Scalar, RunningRange<Scalar, Options...>>,
+                         public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef running_range_state<Element>                    state_type;
-        typedef running_minmax_coeffs<Scalar>                   coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State  = RunningRangeState<Scalar, RunningRange::channels>;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
+        friend FilterBase<Scalar, RunningRange<Scalar, Options...>>;
 
-        explicit running_range(int len) : base_type(len) {}
+        explicit RunningRange(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningRange<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

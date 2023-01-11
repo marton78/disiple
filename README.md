@@ -34,8 +34,8 @@ To build the tests, you'll need the [Conan](https://conan.io/) package manager a
 ```
 mkdir build
 cd build
-conan install ..
-cmake
+conan install .. --build
+cmake ..
 cmake --build .
 ./bin/test
 ```

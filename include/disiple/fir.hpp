@@ -3,31 +3,36 @@
 #include <disiple/impl/filter_base.hpp>
 #include <disiple/impl/fir_impl.hpp>
 #include <disiple/filter_design.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
     /// Finite impulse response (FIR) digital filter
-    template <typename Element, int Length = Eigen::Dynamic>
-    struct fir : public filter_base<Element,
-            fir_state<typename element_traits<Element>::Scalar, Length, element_traits<Element>::Channels>,
-            fir_coeffs<typename element_traits<Element>::Scalar, Length>
-        >
+    template <typename Scalar, typename... Options>
+    class FIR : public FilterBase<Scalar, FIR<Scalar, Options...>>,
+                public Parameters<
+                        List<Options...>,
+                        OptionalValue<int, Length, Eigen::Dynamic>,
+                        OptionalValue<int, Channels, 1>
+                    >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef fir_state<Scalar, Length, Channels>             state_type;
-        typedef fir_coeffs<Scalar, Length>                      coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State = FIRState<Scalar, FIR::length, FIR::channels>;
+        using Coeffs = FIRCoeffs<Scalar, FIR::length>;
 
-        fir() {}
+        FIR() {}
 
-        fir(fir_design d) : base_type(std::move(d)) {}
+        FIR(FIRDesign d) : coeffs_(std::move(d)) {}
 
         template <typename A>
-        fir(const Eigen::ArrayBase<A>& a) : base_type(a) {}
+        FIR(const Eigen::ArrayBase<A>& a) : coeffs_(a) {}
 
-        int length() const { return base_type::coeffs().length(); }
-        using base_type::coeffs;
+        int length() const { return coeffs_.length(); }
+
+    private:
+        friend FilterBase<Scalar, FIR<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

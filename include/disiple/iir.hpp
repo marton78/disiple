@@ -4,27 +4,36 @@
 #include <disiple/impl/iir_sos.hpp>
 #include <disiple/impl/iir_impl.hpp>
 #include <disiple/filter_design.hpp>
+#include <disiple/named_params.hpp>
 
 namespace disiple {
 
+    template <IIRImplementation N>
+    struct Implementation { static constexpr IIRImplementation implementation = N; };
+
     /// Infinite impulse response (IIR) digital filter
-    template <typename Element, int Stages = Eigen::Dynamic, implementation_type Type = DF2T>
-    struct iir : public filter_base<Element,
-            iir_impl<typename element_traits<Element>::Scalar, Stages, element_traits<Element>::Channels, Type>,
-            second_order_sections<typename element_traits<Element>::Scalar, Stages>
-        >
+    template <typename Scalar, typename... Options>
+    class IIR : public FilterBase<Scalar, IIR<Scalar, Options...>>,
+                public Parameters<
+                            List<Options...>,
+                            OptionalValue<IIRImplementation, Implementation, DF2T>,
+                            OptionalValue<int, Stages, Eigen::Dynamic>,
+                            OptionalValue<int, Channels, 1>
+                        >
     {
-        enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar        Scalar;
-        typedef iir_impl<Scalar, Stages, Channels, Type>        state_type;
-        typedef second_order_sections<Scalar, Stages>           coeffs_type;
-        typedef filter_base<Element, state_type, coeffs_type>   base_type;
+    public:
+        using State = IIRImpl<Scalar, IIR::stages, IIR::channels, IIR::implementation>;
+        using Coeffs = SecondOrderSections<Scalar, IIR::stages>;
 
-        iir() {}
-        iir(const iir_design &d) : base_type(d) {}
+        IIR() {}
+        IIR(IIRDesign const& d) : coeffs_(d) {}
 
-        int num_stages() const { return base_type::coeffs().num_stages(); }
-        using base_type::coeffs;
+        int num_stages() const { return coeffs_.num_stages(); }
+        
+    private:
+        friend FilterBase<Scalar, IIR<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

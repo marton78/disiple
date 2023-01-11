@@ -5,24 +5,24 @@
 
 namespace disiple {
 
-    enum implementation_type { DF1, DF2, DF1T, DF2T };
+    enum IIRImplementation { DF1, DF2, DF1T, DF2T };
 
-    template <typename Scalar, int Stages, int Channels, implementation_type Type>
-    struct iir_impl;
+    template <typename Scalar, int Stages, int Channels, IIRImplementation Type>
+    struct IIRImpl;
 
 
     // Direct Form I
 
     template <typename Scalar, int Stages, int Channels>
-    struct iir_impl<Scalar, Stages, Channels, DF1>
+    struct IIRImpl<Scalar, Stages, Channels, DF1>
     {
-        iir_impl()
+        IIRImpl()
         {
             if (Stages != Eigen::Dynamic && Channels != Eigen::Dynamic)
                 initialize();
         }
 
-        void setup(const second_order_sections<Scalar, Stages>& sos, int nchans)
+        void setup(const SecondOrderSections<Scalar, Stages>& sos, int nchans)
         {
             const int nstages = sos.num_stages();
             if (history_.rows() != nchans || history_.cols() != 4 * nstages)
@@ -38,7 +38,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void initialize(const second_order_sections<Scalar, Stages>& sos,
+        void initialize(const SecondOrderSections<Scalar, Stages>& sos,
                         const Eigen::ArrayBase<X>& x_ss)
         {
             Scalar r = (Scalar(1) + sos.b1(0) + sos.b2(0))
@@ -58,7 +58,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const second_order_sections<Scalar, Stages>& sos,
+        void apply(const SecondOrderSections<Scalar, Stages>& sos,
                    Eigen::ArrayBase<X>& xi)
         {
             for (int j=0, k=0; k<history_.cols(); ++j, k+=4)
@@ -83,8 +83,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>   x0_;
         Eigen::Array<Scalar, Channels, S4>  history_; // x1 x2 y1 y2
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 
@@ -93,15 +91,15 @@ namespace disiple {
     // Direct Form II
 
     template <typename Scalar, int Stages, int Channels>
-    struct iir_impl<Scalar, Stages, Channels, DF2>
+    struct IIRImpl<Scalar, Stages, Channels, DF2>
     {
-        iir_impl()
+        IIRImpl()
         {
             if (Stages != Eigen::Dynamic && Channels != Eigen::Dynamic)
                 initialize();
         }
 
-        void setup(const second_order_sections<Scalar, Stages>& sos, int nchans)
+        void setup(const SecondOrderSections<Scalar, Stages>& sos, int nchans)
         {
             const int nstages = sos.num_stages();
             if (w1_.rows() != nchans || w1_.cols() != nstages)
@@ -117,7 +115,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void initialize(const second_order_sections<Scalar, Stages>& sos,
+        void initialize(const SecondOrderSections<Scalar, Stages>& sos,
                         const Eigen::ArrayBase<X>& x_ss)
         {
             Scalar r = Scalar(1) / (Scalar(1) - sos.m1(0) - sos.m2(0));
@@ -132,7 +130,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const second_order_sections<Scalar, Stages>& sos,
+        void apply(const SecondOrderSections<Scalar, Stages>& sos,
                    Eigen::ArrayBase<X>& xi)
         {
             for (int j=0; j<w1_.cols(); ++j)
@@ -148,8 +146,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>      w0_;
         Eigen::Array<Scalar, Channels, Stages> w1_, w2_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 
@@ -159,15 +155,15 @@ namespace disiple {
     // Direct Form II Transposed
 
     template <typename Scalar, int Stages, int Channels>
-    struct iir_impl<Scalar, Stages, Channels, DF2T>
+    struct IIRImpl<Scalar, Stages, Channels, DF2T>
     {
-        iir_impl()
+        IIRImpl()
         {
             if (Stages != Eigen::Dynamic && Channels != Eigen::Dynamic)
                 initialize();
         }
 
-        void setup(const second_order_sections<Scalar, Stages>& sos, int nchans)
+        void setup(const SecondOrderSections<Scalar, Stages>& sos, int nchans)
         {
             const int nstages = sos.num_stages();
             if (d1_.rows() != nchans || d1_.cols() != nstages)
@@ -183,7 +179,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void initialize(const second_order_sections<Scalar, Stages>& sos,
+        void initialize(const SecondOrderSections<Scalar, Stages>& sos,
                         const Eigen::ArrayBase<X>& x_ss)
         {
             Scalar r = (Scalar(1) + sos.b1(0) + sos.b2(0))
@@ -206,7 +202,7 @@ namespace disiple {
         }
 
         template <typename X>
-        void apply(const second_order_sections<Scalar, Stages>& sos,
+        void apply(const SecondOrderSections<Scalar, Stages>& sos,
                    Eigen::ArrayBase<X>& xi)
         {
             for (int j=0; j<d1_.cols(); ++j)
@@ -221,8 +217,6 @@ namespace disiple {
 
         Eigen::Array<Scalar, Channels, 1>      x0_;
         Eigen::Array<Scalar, Channels, Stages> d1_, d2_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
 }

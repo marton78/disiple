@@ -8,7 +8,7 @@
 
 namespace disiple {
 
-    void iir_design::add_single(double pole, double zero)
+    void IIRDesign::add_single(double pole, double zero)
     {
         assert (!(num_poles_&1)); // single comes last
 
@@ -16,7 +16,7 @@ namespace disiple {
         ++num_poles_;
     }
 
-    void iir_design::add_conjugate_pair(const complex_t pole, const complex_t zero)
+    void IIRDesign::add_conjugate_pair(const Complex pole, const Complex zero)
     {
         assert (!(num_poles_&1)); // single comes last
 
@@ -24,7 +24,7 @@ namespace disiple {
         num_poles_ += 2;
     }
 
-    void iir_design::add(const complex_pair& poles, const complex_pair& zeros)
+    void IIRDesign::add(const ComplexPair& poles, const ComplexPair& zeros)
     {
         assert (!(num_poles_&1)); // single comes last
 //        assert (poles.is_matched_pair ());
@@ -35,37 +35,37 @@ namespace disiple {
     }
 
     // notch
-    void iir_design::add_notch(double Wo, double BW)
+    void IIRDesign::add_notch(double Wo, double BW)
     {
-        typedef std::complex<double> complex_t;
+        using Complex = std::complex<double>;
 
         const double gain = 1.0/(1.0+tan(0.5*BW*pi));
         const double w = Wo*pi;
 
-        complex_t zero(cos(w), sin(w));
+        Complex zero(cos(w), sin(w));
 
         Eigen::Matrix2d m(2, 2);
         m << 2.0*gain*zero.real(), -(2.0*gain-1.0), 1.0, 0.0;
 
-        complex_t pole = m.eigenvalues().coeff(0);
+        Complex pole = m.eigenvalues().coeff(0);
 
         add_conjugate_pair(pole, zero);
     }
 
-    iir_design notch(double Wo, double BW)
+    IIRDesign notch(double Wo, double BW)
     {
-        iir_design result;
+        IIRDesign result;
         result.add_notch(Wo, BW);
         result.set_normal(0.0, 1.0);
         return result;
     }
 
     // comb
-    iir_design comb(int N, double BW)
+    IIRDesign comb(int N, double BW)
     {
-        iir_design result;
+        IIRDesign result;
 
-        typedef std::complex<double> complex_t;
+        using Complex = std::complex<double>;
 
         const double gain = 1.0/(1.0+tan(0.25*N*BW*pi));
 
@@ -74,7 +74,7 @@ namespace disiple {
         m(0,N-1) = 2*gain-1;
         m.block(1, 0, N-1, N-1).setIdentity();
 
-        complex_t v= m.eigenvalues().coeff(N-1);
+        Complex v= m.eigenvalues().coeff(N-1);
 
         // find poles and zeros
         const int pairs = N / 2;
@@ -82,7 +82,7 @@ namespace disiple {
         for(int i=1;i<=pairs;i++)
         {
             const double W = i* 2*pi/N;
-            complex_t zero = complex_t(cos(W), sin(W));
+            Complex zero = Complex(cos(W), sin(W));
             result.add_conjugate_pair(v.real()*zero, zero);
         }
 
@@ -97,9 +97,9 @@ namespace disiple {
     namespace
     {
         template <typename F, typename G>
-        fir_window make_window(int nfut, int npast, F f, G g)
+        FIRWindow make_window(int nfut, int npast, F f, G g)
         {
-            fir_window w(nfut, npast);
+            FIRWindow w(nfut, npast);
 
             double omega = pi/double(nfut+1);
             for (int t=0; t<nfut; ++t)
@@ -114,14 +114,14 @@ namespace disiple {
 
         float fir_gain(Eigen::ArrayXf const& coeffs)
         {
-            using pair_type    = std::pair<uint32_t, fft>;
-            using storage_type = std::vector<pair_type>;
+            using Pair    = std::pair<uint32_t, FFT>;
+            using Storage = std::vector<Pair>;
 
             // avoid reallocations between runs
             static std::mutex           mut;
             static Eigen::ArrayXf       x;
             static Eigen::ArrayXcf      z;
-            static storage_type         ffts;
+            static Storage              ffts;
 
             std::lock_guard<std::mutex> locker(mut);
 
@@ -136,11 +136,11 @@ namespace disiple {
 
             // check if an fft of length n already exists
             auto it = std::find_if(ffts.begin(), ffts.end(),
-                                   [n] (pair_type const& p) { return p.first == n; });
+                                   [n] (Pair const& p) { return p.first == n; });
 
             // if not, construct it
             if (it == ffts.end()) {
-                ffts.emplace_back(n, fft(n));
+                ffts.emplace_back(n, FFT(n));
                 it = std::prev(ffts.end());
             }
 
@@ -151,7 +151,7 @@ namespace disiple {
         }
 
         template <typename F>
-        void make_filter(const fir_window& w, fir_design& d, double f0, F f)
+        void make_filter(const FIRWindow& w, FIRDesign& d, double f0, F f)
         {
             const Eigen::DenseIndex n     = w.coeffs.size();
             const Eigen::DenseIndex nfut  = w.index0;
@@ -169,22 +169,22 @@ namespace disiple {
             }
         }
 
-        void gain_to_unity(fir_design& d)
+        void gain_to_unity(FIRDesign& d)
         {
             d.coeffs /= fir_gain(d.coeffs);
         }
 
-        void dc_to_zero(fir_design& d, const fir_window& w)
+        void dc_to_zero(FIRDesign& d, const FIRWindow& w)
         {
             d.coeffs -= w.coeffs.cast<float>() * float(d.coeffs.sum()/w.sum);
         }
     }
 
-    fir_window::fir_window(int nfut, int npast)
+    FIRWindow::FIRWindow(int nfut, int npast)
     : index0(nfut), coeffs(nfut+1+npast), sum(0.0)
     {}
 
-    fir_window hann(int nfut, int npast)
+    FIRWindow hann(int nfut, int npast)
     {
         return make_window(nfut, npast,
                            [] (double x) { return 0.5 - 0.5 * cos(x); },
@@ -192,7 +192,7 @@ namespace disiple {
                            );
     }
 
-    fir_window hamming(int nfut, int npast)
+    FIRWindow hamming(int nfut, int npast)
     {
         return make_window(nfut, npast,
                            [] (double x) { return 0.54 - 0.46 * cos(x); },
@@ -200,7 +200,7 @@ namespace disiple {
                            );
     }
 
-    fir_window blackman(int nfut, int npast)
+    FIRWindow blackman(int nfut, int npast)
     {
         return make_window(nfut, npast,
                            [] (double x) { return 0.42 - 0.5 * cos(x) + 0.08 * cos(2*x); },
@@ -208,7 +208,7 @@ namespace disiple {
                            );
     }
 
-    void lowpass::operator()(const fir_window& w, fir_design& d) const
+    void Lowpass::operator()(const FIRWindow& w, FIRDesign& d) const
     {
         make_filter(w, d, cutoff_,
                     [&] (double x) { return sin(cutoff_ * x) / x; });
@@ -216,7 +216,7 @@ namespace disiple {
         gain_to_unity(d);
     }
 
-    void highpass::operator()(const fir_window& w, fir_design& d) const
+    void Highpass::operator()(const FIRWindow& w, FIRDesign& d) const
     {
         make_filter(w, d, 1.0 - cutoff_,
                     [&] (double x) { return -sin(cutoff_ * x) / x; });
@@ -225,7 +225,7 @@ namespace disiple {
         gain_to_unity(d);
     }
 
-    void bandstop::operator()(const fir_window& w, fir_design& d) const
+    void Bandstop::operator()(const FIRWindow& w, FIRDesign& d) const
     {
         make_filter(w, d, 1.0 + lo_ - hi_,
                     [&] (double x) { return (sin(lo_ * x) - sin(hi_ * x)) / x; });
@@ -233,7 +233,7 @@ namespace disiple {
         gain_to_unity(d);
     }
 
-    void bandpass::operator()(const fir_window& w, fir_design& d) const
+    void Bandpass::operator()(const FIRWindow& w, FIRDesign& d) const
     {
         make_filter(w, d, lo_ - hi_,
                     [&] (double x) { return (sin(lo_ * x) - sin(hi_ * x)) / x; });

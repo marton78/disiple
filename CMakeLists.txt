@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.0)
 project (disiple VERSION 1.0)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -16,7 +16,7 @@ set(LIB_SOURCES
 )
 
 set(TEST_SOURCES
-    test/main.cpp
+    test/named_params.cpp
     test/iir.cpp
     test/polynomial_fir.cpp
     test/band_rms.cpp

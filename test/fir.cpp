@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/fir.hpp>
 #include <type_traits>
 
@@ -120,7 +120,7 @@ TEMPLATE_TEST_CASE_SIG("FIR Filter with predefined parameters", "[fir]",
 ) {
     const TestFixtureFIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = fir<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 5>;
+    using Filter = FIR<Scalar, Length<DynOrder ? Dynamic : 5>, Channels<NChan>>;
 
     SECTION("in_place", "FIR filter applied in place") {
         Filter f(fix.fir_params);
@@ -165,14 +165,14 @@ TEMPLATE_TEST_CASE_SIG("FIR filter with designed with an asymmetric Blackman win
 ) {
     const TestFixtureFIR<Scalar> fix;
     Array<Scalar, Dynamic, Dynamic> y(nchan, ndata);
-    using Filter = fir<Array<Scalar, NChan, 1>, DynOrder ? Dynamic : 25>;
+    using Filter = FIR<Scalar, Length<DynOrder ? Dynamic : 25>, Channels<NChan>>;
 
-    fir_window window = blackman(9, 15);
-    fir_design designs[4] = {
-        fir_design(window, lowpass(.234)),
-        fir_design(window, highpass(.456)),
-        fir_design(window, bandstop(.234, .456)),
-        fir_design(window, bandpass(.234, .456))
+    FIRWindow window = blackman(9, 15);
+    FIRDesign designs[4] = {
+        FIRDesign(window, Lowpass(.234)),
+        FIRDesign(window, Highpass(.456)),
+        FIRDesign(window, Bandstop(.234, .456)),
+        FIRDesign(window, Bandpass(.234, .456))
     };
 
     Array<Scalar, Dynamic, Dynamic> y_data[4] = { fix.lp_data, fix.hp_data, fix.bs_data, fix.bp_data };

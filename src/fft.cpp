@@ -2,8 +2,8 @@
 
 // these typedefs must come before including Accelerate.h,
 // because Accelerate redefines std::complex
-typedef std::complex<float>  cf;
-typedef std::complex<double> cd;
+using CF = std::complex<float>;
+using CD = std::complex<double>;
 
 #if USE_ACCELERATE
 #    include <Accelerate/Accelerate.h>
@@ -23,7 +23,7 @@ namespace disiple {
         return y;
     }
 
-    fft::fft(size_t length)
+    FFT::FFT(size_t length)
     : len_(length), loglen_(ilog2(length))
     {
 #if USE_ACCELERATE
@@ -39,7 +39,7 @@ namespace disiple {
 #endif
     }
 
-    void fft::impl_deleter::operator()(void* p) const
+    void FFT::ImplDeleter::operator()(void* p) const
     {
 #if USE_ACCELERATE
         vDSP_destroy_fftsetup(static_cast<FFTSetup>(p));
@@ -52,7 +52,7 @@ namespace disiple {
 
     using namespace Eigen;
 
-    void fft::operator()(Ref<const ArrayXf, Aligned> x,
+    void FFT::operator()(Ref<const ArrayXf, Aligned> x,
                          Ref<ArrayXcf, Aligned> y) const
     {
         if (static_cast<size_t>(x.size()) != len_)
@@ -76,12 +76,12 @@ namespace disiple {
         //un-scale spectrum, see vDSP reference
         vDSP_ztoc(&w_spl, 1, reinterpret_cast<DSPComplex*>(y.data()), 2, halflen);
         y *= 0.5f;
-        y[len_/2] = cf(y[0].imag(), 0); y[0] = cf(y[0].real(), 0); //unmix DC and Nyquist
+        y[len_/2] = CF(y[0].imag(), 0); y[0] = CF(y[0].real(), 0); //unmix DC and Nyquist
 #elif USE_PFFFT
         pffft_transform_ordered(static_cast<PFFFT_Setup*>(impl_.get()),
                                 x.data(), reinterpret_cast<float*>(y.data()),
                                 work_.data(), PFFFT_FORWARD);
-        y[len_/2] = cf(y[0].imag(), 0); y[0] = cf(y[0].real(), 0); //unmix DC and Nyquist
+        y[len_/2] = CF(y[0].imag(), 0); y[0] = CF(y[0].real(), 0); //unmix DC and Nyquist
 #else
         Eigen::FFT<float>* fft = static_cast<Eigen::FFT<float>*>(impl_.get());
         fft->fwd(y.data(), x.data(), len_);

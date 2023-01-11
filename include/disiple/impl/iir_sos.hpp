@@ -9,14 +9,14 @@
 namespace disiple {
 
     template <typename Scalar, int Stages = Eigen::Dynamic>
-    class second_order_sections
+    class SecondOrderSections
     {
     public:
-        typedef Eigen::Array<Scalar, 4, Stages>    coeffs_t;
-        typedef typename coeffs_t::ConstColXpr     column_t;
+        using Coeffs = Eigen::Array<Scalar, 4, Stages>;
+        using Column = typename Coeffs::ConstColXpr;
 
-        second_order_sections() : scaling_(1) { coeffs_.setZero(); }
-        second_order_sections(const iir_design& l);
+        SecondOrderSections() : scaling_(1) { coeffs_.setZero(); }
+        SecondOrderSections(const IIRDesign& l);
 
         std::complex<Scalar> response(Scalar f) const;
 
@@ -34,13 +34,11 @@ namespace disiple {
         Scalar m2(int i) const { return coeffs_(3,i); }
         Scalar scaling() const { return scaling_; }
 
-        column_t coeffs(int i) const { return coeffs_.col(i); }
+        Column coeffs(int i) const { return coeffs_.col(i); }
 
     protected:
-        coeffs_t  coeffs_;
+        Coeffs  coeffs_;
         Scalar    scaling_;
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     struct wrong_static_size : std::runtime_error
@@ -54,8 +52,8 @@ namespace disiple {
 
         template <typename Scalar>
         void biquad_from_pz_pair(Ref<Array<Scalar, 4, 1>, Aligned> coeffs,
-                                 complex_t pole1, complex_t zero1,
-                                 complex_t pole2, complex_t zero2);
+                                 Complex pole1, Complex zero1,
+                                 Complex pole2, Complex zero2);
 
         template <typename Scalar>
         void response(Ref<const Array<Scalar, 4, Dynamic>, Aligned, Stride<4, 1>> coeffs,
@@ -67,7 +65,7 @@ namespace disiple {
     }
 
     template <typename Scalar, int Stages>
-    second_order_sections<Scalar, Stages>::second_order_sections(const iir_design& l) : scaling_(1)
+    SecondOrderSections<Scalar, Stages>::SecondOrderSections(const IIRDesign& l) : scaling_(1)
     {
         const int n = (l.num_poles()+1)/2;
 
@@ -85,20 +83,20 @@ namespace disiple {
     }
 
     template <typename Scalar, int Stages>
-    std::complex<Scalar> second_order_sections<Scalar, Stages>::response(Scalar f) const
+    std::complex<Scalar> SecondOrderSections<Scalar, Stages>::response(Scalar f) const
     {
-        typedef std::complex<Scalar> complex_t;
+        using Complex = std::complex<Scalar>;
 
-        const complex_t czn1(std::cos(-f), std::sin(-f));
-        const complex_t czn2(std::cos(-Scalar(2)*f), std::sin(-Scalar(2)*f));
+        const Complex czn1(std::cos(-f), std::sin(-f));
+        const Complex czn2(std::cos(-Scalar(2)*f), std::sin(-Scalar(2)*f));
 
-        complex_t z(scaling_);
+        Complex z(scaling_);
 
         for (int i=0; i<num_stages(); ++i)
         {
             auto c = coeffs_.col(i);
-            z *= (complex_t(1) + c[0] * czn1 + c[1] * czn2)
-               / (complex_t(1) - c[2] * czn1 - c[3] * czn2);
+            z *= (Complex(1) + c[0] * czn1 + c[1] * czn2)
+               / (Complex(1) - c[2] * czn1 - c[3] * czn2);
         }
 
         return z;
@@ -106,7 +104,7 @@ namespace disiple {
 
     template <typename Scalar, int Stages>
     template <typename F, typename Z>
-    void second_order_sections<Scalar, Stages>::response(const Eigen::ArrayBase<F>& f, Eigen::ArrayBase<Z>& z) const
+    void SecondOrderSections<Scalar, Stages>::response(const Eigen::ArrayBase<F>& f, Eigen::ArrayBase<Z>& z) const
     {
         internal::response<Scalar>(coeffs_, scaling_, f.derived(), z.derived());
     }

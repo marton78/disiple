@@ -11,11 +11,11 @@ namespace disiple {
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
     template <typename Scalar>
-    struct running_minmax_coeffs
+    struct RunningMinMaxCoeffs
     {
-        running_minmax_coeffs() : len_(0) {}
+        RunningMinMaxCoeffs() : len_(0) {}
 
-        explicit running_minmax_coeffs(int len)
+        explicit RunningMinMaxCoeffs(int len)
         : len_(len) {}
 
         static Scalar scaling() { return Scalar(1); }
@@ -24,14 +24,12 @@ namespace disiple {
         int len_;
     };
 
-    template <typename Element, template<typename> class Compare>
-    struct running_minmax_state
+    template <typename Scalar, int Channels, template<typename> class Compare>
+    struct RunningMinMaxState
     {
-        enum { Channels = element_traits<Element>::Channels };
-        typedef typename element_traits<Element>::Scalar  Scalar;
-        typedef running_minmax_coeffs<Scalar>             Coeffs;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
-        running_minmax_state()
+        RunningMinMaxState()
         {
             if (Channels != Eigen::Dynamic)
                 initialize();
@@ -55,7 +53,7 @@ namespace disiple {
 
         template <typename X>
         void apply(const Coeffs& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             //David Lemire, “Streaming Maximum-Minimum Filter
             //Using No More than Three Comparisons per Element”
@@ -98,17 +96,16 @@ namespace disiple {
             process_result([] (Scalar src, Scalar& dst) { dst = src; }, xi);
         }
 
-        typedef std::deque<std::pair<size_t, Scalar>> buf_t;
+        using buf_t = std::deque<std::pair<size_t, Scalar>>;
         Eigen::Array<buf_t, Channels, 1> bufs_;
         int length_;
     };
 
 
-    template <typename Element>
-    struct running_range_state
+    template <typename Scalar, int Channels>
+    struct RunningRangeState
     {
-        typedef typename element_traits<Element>::Scalar  Scalar;
-        typedef running_minmax_coeffs<Scalar>             Coeffs;
+        using Coeffs = RunningMinMaxCoeffs<Scalar>;
 
         void setup(const Coeffs& coeffs, int nchans)
         {
@@ -133,14 +130,14 @@ namespace disiple {
 
         template <typename X>
         void apply(const Coeffs& coeffs,
-                   const Eigen::ArrayBase<X>& xi, dry_run_t)
+                   const Eigen::ArrayBase<X>& xi, DryRun)
         {
             smin.apply(coeffs, xi, dry_run);
             smax.apply(coeffs, xi, dry_run);
         }
 
-        running_minmax_state<Element, std::less>    smin;
-        running_minmax_state<Element, std::greater> smax;
+        RunningMinMaxState<Scalar, Channels, std::less>    smin;
+        RunningMinMaxState<Scalar, Channels, std::greater> smax;
     };
 
 }

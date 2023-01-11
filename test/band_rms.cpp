@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <disiple/band_rms.hpp>
 #include <disiple/iir.hpp>
 #include <disiple/moving_average.hpp>
@@ -17,20 +17,19 @@ namespace {
 }
 
 TEMPLATE_TEST_CASE_SIG("Running Bandpass Root Mean Square", "[running_stats]",
-    ((typename Scalar, int Dim), Scalar, Dim), 
+    ((typename Scalar, int NChan), Scalar, NChan), 
     (float, Dynamic), (double, Dynamic),
     (float, nchan),   (double, nchan)
 ) {
-    using Element     = Array<Scalar, Dim, 1>;
-    using Bandpass    = iir<Element, 4>;
-    using Expectation = moving_average<Element>;
+    using BPFilter    = IIR<Scalar, Stages<4>, Channels<NChan>>;
+    using Expectation = MovingAverage<Scalar, Channels<NChan>>;
 
-    iir_design bandpass_design(butterworth(4), bandpass(.1, .2));
+    IIRDesign bandpass_design(butterworth(4), Bandpass(.1, .2));
     int expectation_design = 10;
 
-    band_rms<Element, Bandpass, Expectation> brms(bandpass_design, expectation_design);
+    BandRMS<Scalar, BPFilter, Expectation> brms(bandpass_design, expectation_design);
 
-    Bandpass     bp(bandpass_design);
+    BPFilter     bp(bandpass_design);
     Expectation  ex(expectation_design);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
@@ -44,7 +43,7 @@ TEMPLATE_TEST_CASE_SIG("Running Bandpass Root Mean Square", "[running_stats]",
         ex.apply(z);                  // mean
         z = (z * Scalar(2)).sqrt();   // root
 
-        // Calculate results via band_rms
+        // Calculate results via BandRMS
         brms.apply(data.col(i), y);
 
         REQUIRE( (z - y).abs().maxCoeff() <= threshold<Scalar>() );
