@@ -1,5 +1,5 @@
 [requires]
-eigen/3.3.9
+eigen/3.4.0
 
 [build_requires]
 catch2/3.2.1

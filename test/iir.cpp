@@ -263,7 +263,7 @@ TEST_CASE("IIR filter response", "[iir]")
     resp_imag << 0.0,    0.807314371339338587851841566589,   -0.167701182610685006757478276995,   -0.953437293401544816440207341657,   -0.128390059799641548243798183648,    0.063234523098741196589500646041,    0.030406008571820575259181396177,    0.008442758976603353601730894695,    0.000995779213869737262962433810,    0.0;
 
     second_order_sections<double> sos = iir_design(butterworth(3), bandpass(.1, .4));
-    ArrayXd f = ArrayXd::LinSpaced(Sequential, 10, 0, 1);
+    ArrayXd f = ArrayXd::LinSpaced(10, 0, 1);
     ArrayXcd z(10);
     sos.response(f, z);
     REQUIRE( (resp_real - z.real()).abs().maxCoeff() <= 1e-10 );
