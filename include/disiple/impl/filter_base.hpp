@@ -12,7 +12,8 @@ namespace disiple {
         static_assert(std::is_arithmetic<Scalar>::value,
                       "Scalar must be an arithmetic value");
         template <typename, typename> class have_dry_run_apply;
-        using Map1 = Eigen::Map<Eigen::Array<Scalar, 1, 1>>;
+        using Arr1 = Eigen::Array<Scalar, 1, 1>;
+        using Map1 = Eigen::Map<Arr1>;
 
     public:
         auto&       state()        { return static_cast<Derived*>(this)->state_; }
@@ -89,23 +90,23 @@ namespace disiple {
         Scalar operator()(Scalar x)
         {
             Scalar y;
-            apply(Map1(&x), Map1(&y));
+            apply(Arr1(x), Map1(&y));
             return y;
         }
 
         void apply(Scalar x)
         {
-            apply(Map1(&x));
+            apply(Arr1(x));
         }
 
         void apply(Scalar x, Scalar& y)
         {
-            apply(Map1(&x), Map1(&y));
+            apply(Arr1(x), Map1(&y));
         }
 
         void apply(Scalar x, DryRun)
         {
-            apply(Map1(&x), dry_run);
+            apply(Arr1(x), dry_run);
         }
 
     private:
