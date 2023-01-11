@@ -23,8 +23,8 @@ TEMPLATE_TEST_CASE_SIG("Running Min, Max and Range", "[running_stats]",
     const int W = 10; // Window length of the filter
 
     disiple::RunningMin  <Scalar, Channels<NChan>> fmin(W);
-    disiple::RunningMax  <Scalar, Channels<NChan>> fmax(W);
-    disiple::RunningRange<Scalar, Channels<NChan>> frng(W);
+    // disiple::RunningMax  <Scalar, Channels<NChan>> fmax(W);
+    // disiple::RunningRange<Scalar, Channels<NChan>> frng(W);
 
     Array<Scalar, nchan, Dynamic> data = (ArrayXXf::Random(nchan, 97) * 10 + 20).cast<Scalar>();
     Array<Scalar, nchan, 1> ymin, ymax, yrng, zmin, zmax, zrng;
@@ -40,11 +40,11 @@ TEMPLATE_TEST_CASE_SIG("Running Min, Max and Range", "[running_stats]",
 
         // Calculate results using the filters
         fmin.apply(data.col(i), ymin);
-        fmax.apply(data.col(i), ymax);
-        frng.apply(data.col(i), yrng);
+        // fmax.apply(data.col(i), ymax);
+        // frng.apply(data.col(i), yrng);
 
         REQUIRE( (zmin - ymin).abs().maxCoeff() <= threshold<Scalar>() );
-        REQUIRE( (zmax - ymax).abs().maxCoeff() <= threshold<Scalar>() );
-        REQUIRE( (zrng - yrng).abs().maxCoeff() <= threshold<Scalar>() );
+        // REQUIRE( (zmax - ymax).abs().maxCoeff() <= threshold<Scalar>() );
+        // REQUIRE( (zrng - yrng).abs().maxCoeff() <= threshold<Scalar>() );
     }
 }

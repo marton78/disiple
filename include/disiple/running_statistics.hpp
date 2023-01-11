@@ -7,57 +7,69 @@
 
 namespace disiple {
 
-    template <typename... Options>
-    using RunningStatsParameters = Parameters<
-        List<Options...>,
-        OptionalValue<int, Channels, 1>
-    >;
-
     /// Filter to calculate running minimum.
     /// Algorithm from: David Lemire, “Streaming Maximum-Minimum Filter Using No
     /// More than Three Comparisons per Element”,
     /// Nordic Journal of Computing,  Vol. 13, 2006
 
     template <typename Scalar, typename... Options>
-    struct RunningMin : public FilterBase<Scalar, RunningStatsParameters<Options...>::channels,
-        RunningMinMaxState<Scalar, RunningStatsParameters<Options...>::channels, std::less>,
-        RunningMinMaxCoeffs<Scalar>
-    >
+    class RunningMin : public FilterBase<Scalar, RunningMin<Scalar, Options...>>,
+                       public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        using P      = RunningStatsParameters<Options...>;
-        using State  = RunningMinMaxState<Scalar, P::channels, std::less>;
+    public:
+        using State  = RunningMinMaxState<Scalar, RunningMin::channels, std::less>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+        friend FilterBase<Scalar, RunningMin<Scalar, Options...>>;
 
-        explicit RunningMin(int len) : Base(len) {}
+        explicit RunningMin(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningMin<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
     template <typename Scalar, typename... Options>
-    struct RunningMax : public FilterBase<Scalar, RunningStatsParameters<Options...>::channels,
-        RunningMinMaxState<Scalar, RunningStatsParameters<Options...>::channels, std::greater>,
-        RunningMinMaxCoeffs<Scalar>
-    >
+    class RunningMax : public FilterBase<Scalar, RunningMax<Scalar, Options...>>,
+                       public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        using P      = RunningStatsParameters<Options...>;
-        using State  = RunningMinMaxState<Scalar, P::channels, std::greater>;
+    public:
+        using State  = RunningMinMaxState<Scalar, RunningMax::channels, std::greater>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+        friend FilterBase<Scalar, RunningMax<Scalar, Options...>>;
 
-        explicit RunningMax(int len) : Base(len) {}
+        explicit RunningMax(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningMax<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
     template <typename Scalar, typename... Options>
-    struct RunningRange : public FilterBase<Scalar, RunningStatsParameters<Options...>::channels,
-        RunningRangeState<Scalar, RunningStatsParameters<Options...>::channels>,
-        RunningMinMaxCoeffs<Scalar>
-    >
+    class RunningRange : public FilterBase<Scalar, RunningRange<Scalar, Options...>>,
+                         public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        using P      = RunningStatsParameters<Options...>;
-        using State  = RunningRangeState<Scalar, P::channels>;
+    public:
+        using State  = RunningRangeState<Scalar, RunningRange::channels>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+        friend FilterBase<Scalar, RunningRange<Scalar, Options...>>;
 
-        explicit RunningRange(int len) : Base(len) {}
+        explicit RunningRange(int len) : coeffs_(len) {}
+
+    private:
+        friend FilterBase<Scalar, RunningRange<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

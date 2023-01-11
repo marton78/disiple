@@ -7,34 +7,32 @@
 
 namespace disiple {
 
-    template <typename... Options>
-    using FIRParameters = Parameters<
-        List<Options...>,
-        OptionalValue<int, Length, Eigen::Dynamic>,
-        OptionalValue<int, Channels, 1>
-    >;
-
     /// Finite impulse response (FIR) digital filter
     template <typename Scalar, typename... Options>
-    struct FIR : public FilterBase<Scalar, FIRParameters<Options...>::channels,
-            FIRState <Scalar, FIRParameters<Options...>::length, FIRParameters<Options...>::channels>,
-            FIRCoeffs<Scalar, FIRParameters<Options...>::length>
-        >
+    class FIR : public FilterBase<Scalar, FIR<Scalar, Options...>>,
+                public Parameters<
+                        List<Options...>,
+                        OptionalValue<int, Length, Eigen::Dynamic>,
+                        OptionalValue<int, Channels, 1>
+                    >
     {
-        using P      = FIRParameters<Options...>;
-        using State  = FIRState<Scalar, P::length, P::channels>;
-        using Coeffs = FIRCoeffs<Scalar, P::length>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+    public:
+        using State = FIRState<Scalar, FIR::length, FIR::channels>;
+        using Coeffs = FIRCoeffs<Scalar, FIR::length>;
 
         FIR() {}
 
-        FIR(FIRDesign d) : Base(std::move(d)) {}
+        FIR(FIRDesign d) : coeffs_(std::move(d)) {}
 
         template <typename A>
-        FIR(const Eigen::ArrayBase<A>& a) : Base(a) {}
+        FIR(const Eigen::ArrayBase<A>& a) : coeffs_(a) {}
 
-        int length() const { return Base::coeffs().length(); }
-        using Base::coeffs;
+        int length() const { return coeffs_.length(); }
+
+    private:
+        friend FilterBase<Scalar, FIR<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

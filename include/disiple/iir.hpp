@@ -11,31 +11,29 @@ namespace disiple {
     template <IIRImplementation N>
     struct Implementation { static constexpr IIRImplementation implementation = N; };
 
-    template <typename... Options>
-    using IIRParameters = Parameters<
-        List<Options...>,
-        OptionalValue<IIRImplementation, Implementation, DF2T>,
-        OptionalValue<int, Stages, Eigen::Dynamic>,
-        OptionalValue<int, Channels, 1>
-    >;
-
     /// Infinite impulse response (IIR) digital filter
     template <typename Scalar, typename... Options>
-    struct IIR : public FilterBase<Scalar, IIRParameters<Options...>::channels,
-            IIRImpl<Scalar, IIRParameters<Options...>::stages, IIRParameters<Options...>::channels, IIRParameters<Options...>::implementation>,
-            SecondOrderSections<Scalar, IIRParameters<Options...>::stages>
-        >
+    class IIR : public FilterBase<Scalar, IIR<Scalar, Options...>>,
+                public Parameters<
+                            List<Options...>,
+                            OptionalValue<IIRImplementation, Implementation, DF2T>,
+                            OptionalValue<int, Stages, Eigen::Dynamic>,
+                            OptionalValue<int, Channels, 1>
+                        >
     {
-        using P      = IIRParameters<Options...>;
-        using State  = IIRImpl<Scalar, P::stages, P::channels, P::implementation>;
-        using Coeffs = SecondOrderSections<Scalar, P::stages>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+    public:
+        using State = IIRImpl<Scalar, IIR::stages, IIR::channels, IIR::implementation>;
+        using Coeffs = SecondOrderSections<Scalar, IIR::stages>;
 
         IIR() {}
-        IIR(const IIRDesign &d) : Base(d) {}
+        IIR(IIRDesign const& d) : coeffs_(d) {}
 
-        int num_stages() const { return Base::coeffs().num_stages(); }
-        using Base::coeffs;
+        int num_stages() const { return coeffs_.num_stages(); }
+        
+    private:
+        friend FilterBase<Scalar, IIR<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

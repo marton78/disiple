@@ -6,43 +6,48 @@
 
 namespace disiple {
 
-    template <typename... Options>
-    using MovingAverageParameters = Parameters<
-        List<Options...>,
-        OptionalValue<int, Length, Eigen::Dynamic>,
-        OptionalValue<int, Stages, 1>,
-        OptionalValue<int, Channels, 1>
-    >;
-
     template <typename Scalar, typename... Options>
-    struct MovingAverage : public FilterBase<Scalar, MovingAverageParameters<Options...>::channels,
-        MAvgState <Scalar, MovingAverageParameters<Options...>::length, MovingAverageParameters<Options...>::channels, MovingAverageParameters<Options...>::stages>,
-        MAvgCoeffs<Scalar, MovingAverageParameters<Options...>::length, MovingAverageParameters<Options...>::stages>
-    >
+    class MovingAverage : public FilterBase<Scalar, MovingAverage<Scalar, Options...>>,
+                          public Parameters<
+                                List<Options...>,
+                                OptionalValue<int, Length, Eigen::Dynamic>,
+                                OptionalValue<int, Stages, 1>,
+                                OptionalValue<int, Channels, 1>
+                            >
     {
-        using P      = MovingAverageParameters<Options...>;
-        using State  = MAvgState <Scalar, P::length, P::channels, P::stages>;
-        using Coeffs = MAvgCoeffs<Scalar, P::length, P::stages>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+    public:
+        using State  = MAvgState <Scalar, MovingAverage::length, MovingAverage::channels, MovingAverage::stages>;
+        using Coeffs = MAvgCoeffs<Scalar, MovingAverage::length, MovingAverage::stages>;
 
         MovingAverage() {}
-        explicit MovingAverage(int length) : Base(length) {}
-        MovingAverage(int length, int stages) : Base(length, stages) {}
+        explicit MovingAverage(int length) : coeffs_(length) {}
+        MovingAverage(int length, int stages) : coeffs_(length, stages) {}
+
+    private:
+        friend FilterBase<Scalar, MovingAverage<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 
-    template <typename Scalar, int Channels = 1>
-    struct CumMovingAverage : public FilterBase<Scalar, Channels,
-        CumMAvgState<Scalar, Channels>,
-        CumMAvgCoeffs<Scalar>
-    >
+    template <typename Scalar, typename... Options>
+    class CumMovingAverage : public FilterBase<Scalar, CumMovingAverage<Scalar, Options...>>,
+                             public Parameters<
+                                    List<Options...>,
+                                    OptionalValue<int, Channels, 1>
+                                >
     {
-        using State  = CumMAvgState<Scalar, Channels>;
+    public:
+        using State  = CumMAvgState<Scalar, CumMovingAverage::channels>;
         using Coeffs = CumMAvgCoeffs<Scalar>;
-        using Base   = FilterBase<Scalar, Channels, State, Coeffs>;
 
         CumMovingAverage() {}
-        explicit CumMovingAverage(int length) : Base(length) {}
+        explicit CumMovingAverage(int length) : coeffs_(length) {}
+
+    private:
+        friend FilterBase<Scalar, CumMovingAverage<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }

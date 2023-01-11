@@ -6,28 +6,23 @@ namespace disiple {
 
     enum DryRun { dry_run };
 
-    template <typename Scalar, int Channels,
-              typename State, typename Coeffs>
+    template <typename Scalar, typename Derived>
     class FilterBase
     {
         static_assert(std::is_arithmetic<Scalar>::value,
                       "Scalar must be an arithmetic value");
-        template <typename> class have_dry_run_apply;
+        template <typename, typename> class have_dry_run_apply;
         using Map1 = Eigen::Map<Eigen::Array<Scalar, 1, 1>>;
 
-    protected:
-        template <typename... Args>
-        explicit FilterBase(Args&&... args) : coeffs_(std::forward<Args>(args)...) {}
-
-        State& state() { return state_; }
-        const State& state() const { return state_; }
-
-        Coeffs& coeffs() { return coeffs_; }
-        const Coeffs& coeffs() const { return coeffs_; }
-
     public:
+        auto&       state()        { return static_cast<Derived*>(this)->state_; }
+        const auto& state() const  { return static_cast<Derived const*>(this)->state_; }
+
+        auto&       coeffs()       { return static_cast<Derived*>(this)->coeffs_; }
+        const auto& coeffs() const { return static_cast<Derived const*>(this)->coeffs_; }
+
         /// Initialize filter state to zero.
-        void initialize() { state_.initialize(); }
+        void initialize() { state().initialize(); }
 
         /// Initialize filter state to a constant (steady state) value.
         /// (As if an infinite number of constant vectors @x_ss@ had
@@ -35,8 +30,8 @@ namespace disiple {
         template <typename X>
         void initialize(const Eigen::ArrayBase<X>& x_ss)
         {
-            state_.setup(coeffs_, static_cast<int>(x_ss.rows()));
-            state_.initialize(coeffs_, x_ss);
+            state().setup(coeffs(), static_cast<int>(x_ss.rows()));
+            state().initialize(coeffs(), x_ss);
         }
 
         /// Apply filter in-place
@@ -44,11 +39,11 @@ namespace disiple {
         template <typename X>
         void apply(Eigen::ArrayBase<X>& x)
         {
-            state_.setup(coeffs_, static_cast<int>(x.rows()));
+            state().setup(coeffs(), static_cast<int>(x.rows()));
             for (Eigen::DenseIndex i=0; i<x.cols(); ++i)
             {
                 auto xi = x.col(i);
-                state_.apply(coeffs_, xi);
+                state().apply(coeffs(), xi);
             }
         }
 
@@ -63,12 +58,12 @@ namespace disiple {
         template <typename X, typename Y>
         void apply(const Eigen::ArrayBase<X>& x, Eigen::ArrayBase<Y>& y)
         {
-            state_.setup(coeffs_, static_cast<int>(x.rows()));
+            state().setup(coeffs(), static_cast<int>(x.rows()));
             for (Eigen::DenseIndex i=0; i<x.cols(); ++i)
             {
                 auto xi = x.col(i);
                 auto yi = y.col(i);
-                state_.apply(coeffs_, yi = xi);
+                state().apply(coeffs(), yi = xi);
             }
         }
 
@@ -83,70 +78,64 @@ namespace disiple {
         template <typename X>
         void apply(const Eigen::ArrayBase<X>& x, DryRun)
         {
-            state_.setup(coeffs_, static_cast<int>(x.rows()));
+            state().setup(coeffs(), static_cast<int>(x.rows()));
             for (Eigen::DenseIndex i=0; i<x.cols(); ++i)
             {
-                enum { tag = have_dry_run_apply<typename X::ColXpr>::value };
+                enum { tag = have_dry_run_apply<decltype(Derived::coeffs_), typename X::ColXpr>::value };
                 apply_dry(x.col(i), std::integral_constant<bool, tag>());
             }
         }
 
-        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
-        Scalar operator()(Scalar x, Enable* = 0)
+        Scalar operator()(Scalar x)
         {
             Scalar y;
             apply(Map1(&x), Map1(&y));
             return y;
         }
 
-        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
-        void apply(Scalar x, Enable* = 0)
+        void apply(Scalar x)
         {
             apply(Map1(&x));
         }
 
-        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
-        void apply(Scalar x, Scalar& y, Enable* = 0)
+        void apply(Scalar x, Scalar& y)
         {
             apply(Map1(&x), Map1(&y));
         }
 
-        template <int C = Channels, typename Enable = typename std::enable_if<C == 1>::type>
-        void apply(Scalar x, DryRun, Enable* = 0)
+        void apply(Scalar x, DryRun)
         {
             apply(Map1(&x), dry_run);
         }
 
     private:
-        template <typename A>
+        template <typename C, typename A>
         class have_dry_run_apply
         {
             template <typename S> static uint32_t test(decltype(
-                    std::declval<S>().apply(std::declval<Coeffs>(),
+                    std::declval<S>().apply(std::declval<C const&>(),
                                             std::declval<A const&>(),
                                             dry_run)
                 )* = 0);
             template <typename S> static uint16_t test(...);
 
         public:
-            enum { value = sizeof(test<State>(0)) == 4 };
+            enum { value = sizeof(test<decltype(Derived::state_)>(0)) == 4 };
         };
 
         template <typename X>
         void apply_dry(const Eigen::ArrayBase<X>& xi, std::true_type)
         {
-            state_.apply(coeffs_, xi, dry_run);
+            state().apply(coeffs(), xi, dry_run);
         }
 
         template <typename X>
         void apply_dry(const Eigen::ArrayBase<X>& xi, std::false_type)
         {
-            state_.apply(coeffs_, backup_ = xi);
+            state().apply(coeffs(), backup_ = xi);
         }
 
-        State  state_;
-        Coeffs coeffs_;
-        Eigen::Array<Scalar, Channels, 1> backup_;
+        Eigen::Array<Scalar, /*Derived::Channels*/-1, 1> backup_;
     };
 
 }

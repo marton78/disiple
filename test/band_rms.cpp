@@ -27,7 +27,7 @@ TEMPLATE_TEST_CASE_SIG("Running Bandpass Root Mean Square", "[running_stats]",
     IIRDesign bandpass_design(butterworth(4), Bandpass(.1, .2));
     int expectation_design = 10;
 
-    BandRMS<Scalar, BPFilter, Expectation, Channels<NChan>> brms(bandpass_design, expectation_design);
+    BandRMS<Scalar, BPFilter, Expectation> brms(bandpass_design, expectation_design);
 
     BPFilter     bp(bandpass_design);
     Expectation  ex(expectation_design);

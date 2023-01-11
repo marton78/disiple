@@ -14,29 +14,23 @@ namespace disiple {
     /// e.g. BandRMS<Array4f, iir<Array4f, 4>, moving_average<Array4f> >
     /// See: http://en.wikipedia.org/wiki/Root_mean_square#RMS_of_common_waveforms
 
-    template <typename... Options>
-    using BandRMSParameters = Parameters<
-        List<Options...>,
-        OptionalValue<int, Channels, 1>
-    >;
-
-    template <typename Scalar, typename Bandpass, typename Expectation, typename... Options>
-    struct BandRMS : public FilterBase<Scalar,
-        BandRMSParameters<Options...>::channels,
-        BandRMSState <Scalar, Bandpass, Expectation>,
-        BandRMSCoeffs<Scalar, Bandpass, Expectation>
-    >
+    template <typename Scalar, typename Bandpass, typename Expectation>
+    class BandRMS : public FilterBase<Scalar, BandRMS<Scalar, Bandpass, Expectation>>
     {
-        using P      = BandRMSParameters<Options...>;
+    public:
         using State  = BandRMSState <Scalar, Bandpass, Expectation>;
         using Coeffs = BandRMSCoeffs<Scalar, Bandpass, Expectation>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
 
         BandRMS() {}
 
         template <typename TB, typename TE>
-        BandRMS(TB&& b, TE&& e) : Base(std::forward<TB>(b), std::forward<TE>(e))
+        BandRMS(TB&& b, TE&& e) : coeffs_(std::forward<TB>(b), std::forward<TE>(e))
         {}
+
+    private:
+        friend FilterBase<Scalar, BandRMS<Scalar, Bandpass, Expectation>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 

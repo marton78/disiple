@@ -7,26 +7,25 @@
 
 namespace disiple {
 
-    template <typename... Options>
-    using DelayParameters = Parameters<
-        List<Options...>,
-        OptionalValue<int, Length, Eigen::Dynamic>,
-        OptionalValue<int, Channels, 1>
-    >;
-
     template <typename Scalar, typename... Options>
-    struct Delay : public FilterBase<Scalar, DelayParameters<Options...>::channels,
-        DelayState <Scalar, DelayParameters<Options...>::length, DelayParameters<Options...>::channels>,
-        DelayCoeffs<Scalar, DelayParameters<Options...>::length>
-    >
+    class Delay : public FilterBase<Scalar, Delay<Scalar, Options...>>,
+                  public Parameters<
+                        List<Options...>,
+                        OptionalValue<int, Length, Eigen::Dynamic>,
+                        OptionalValue<int, Channels, 1>
+                    >
     {
-        using P      = DelayParameters<Options...>;
-        using State  = DelayState<Scalar, P::length, P::channels>;
-        using Coeffs = DelayCoeffs<Scalar, P::length>;
-        using Base   = FilterBase<Scalar, P::channels, State, Coeffs>;
+    public:
+        using State  = DelayState<Scalar, Delay::length, Delay::channels>;
+        using Coeffs = DelayCoeffs<Scalar, Delay::length>;
 
         Delay() {}
-        explicit Delay(int length) : Base(length) {}
+        explicit Delay(int length) : coeffs_(length) {}
+
+    private:
+        friend FilterBase<Scalar, Delay<Scalar, Options...>>;
+        State  state_;
+        Coeffs coeffs_;
     };
 
 }
