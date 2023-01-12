@@ -2,10 +2,29 @@
 
 namespace disiple {
 
+    enum { NotStatic = -1 };
+
+    template <int N>
+    struct ParameterValue {
+        enum { Static = N };
+        ParameterValue() = default;
+        ParameterValue(int value) { assert(value == Static); }
+        constexpr operator int() const noexcept { return Static; }
+    };
+
+    template <>
+    struct ParameterValue<NotStatic> {
+        enum { Static = NotStatic };
+        ParameterValue(int value) : dynamic_(value) {}
+        operator int() const noexcept { return dynamic_; }
+    private:
+        int dynamic_;
+    };
+
     // some common named parameters
-    template <int N> struct Channels { enum { channels = N }; };
-    template <int N> struct Stages   { enum { stages = N }; };
-    template <int N> struct Length   { enum { length = N }; };
+    template <int N> struct Channels { using ChannelsValue = ParameterValue<N>; };
+    template <int N> struct Stages   { using StagesValue   = ParameterValue<N>; };
+    template <int N> struct Length   { using LengthValue   = ParameterValue<N>; };
 
     // See test/named_params.cpp for usage
     template <typename ListArgs, typename... Params>

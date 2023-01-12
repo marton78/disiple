@@ -22,8 +22,8 @@ namespace disiple {
                             >
     {
     public:
-        using State  = PolyFIRState<Scalar, PolynomialFIR::length, PolynomialFIR::channels, I>;
-        using Coeffs = PolyFIRCoeffs<Scalar, PolynomialFIR::length, I, J, K>;
+        using State  = PolyFIRState<Scalar, PolynomialFIR::LengthValue::Static, PolynomialFIR::ChannelsValue::Static, I>;
+        using Coeffs = PolyFIRCoeffs<Scalar, PolynomialFIR::LengthValue::Static, I, J, K>;
 
         PolynomialFIR() {}
 

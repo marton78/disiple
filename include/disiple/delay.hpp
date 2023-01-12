@@ -16,8 +16,8 @@ namespace disiple {
                     >
     {
     public:
-        using State  = DelayState<Scalar, Delay::length, Delay::channels>;
-        using Coeffs = DelayCoeffs<Scalar, Delay::length>;
+        using State  = DelayState<Scalar, Delay::LengthValue::Static, Delay::ChannelsValue::Static>;
+        using Coeffs = DelayCoeffs<Scalar, Delay::LengthValue::Static>;
 
         Delay() {}
         explicit Delay(int length) : coeffs_(length) {}

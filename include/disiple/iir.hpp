@@ -22,8 +22,8 @@ namespace disiple {
                         >
     {
     public:
-        using State = IIRImpl<Scalar, IIR::stages, IIR::channels, IIR::implementation>;
-        using Coeffs = SecondOrderSections<Scalar, IIR::stages>;
+        using State = IIRImpl<Scalar, IIR::StagesValue::Static, IIR::ChannelsValue::Static, IIR::implementation>;
+        using Coeffs = SecondOrderSections<Scalar, IIR::StagesValue::Static>;
 
         IIR() {}
         IIR(IIRDesign const& d) : coeffs_(d) {}

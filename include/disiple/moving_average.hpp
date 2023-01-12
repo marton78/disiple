@@ -16,8 +16,8 @@ namespace disiple {
                             >
     {
     public:
-        using State  = MAvgState <Scalar, MovingAverage::length, MovingAverage::channels, MovingAverage::stages>;
-        using Coeffs = MAvgCoeffs<Scalar, MovingAverage::length, MovingAverage::stages>;
+        using State  = MAvgState <Scalar, MovingAverage::LengthValue::Static, MovingAverage::ChannelsValue::Static, MovingAverage::StagesValue::Static>;
+        using Coeffs = MAvgCoeffs<Scalar, MovingAverage::LengthValue::Static, MovingAverage::StagesValue::Static>;
 
         MovingAverage() {}
         explicit MovingAverage(int length) : coeffs_(length) {}
@@ -38,7 +38,7 @@ namespace disiple {
                                 >
     {
     public:
-        using State  = CumMAvgState<Scalar, CumMovingAverage::channels>;
+        using State  = CumMAvgState<Scalar, CumMovingAverage::ChannelsValue::Static>;
         using Coeffs = CumMAvgCoeffs<Scalar>;
 
         CumMovingAverage() {}

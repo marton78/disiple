@@ -20,7 +20,7 @@ namespace disiple {
                             >
     {
     public:
-        using State  = RunningMinMaxState<Scalar, RunningMin::channels, std::less>;
+        using State  = RunningMinMaxState<Scalar, RunningMin::ChannelsValue::Static, std::less>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
         friend FilterBase<Scalar, RunningMin<Scalar, Options...>>;
 
@@ -40,7 +40,7 @@ namespace disiple {
                             >
     {
     public:
-        using State  = RunningMinMaxState<Scalar, RunningMax::channels, std::greater>;
+        using State  = RunningMinMaxState<Scalar, RunningMax::ChannelsValue::Static, std::greater>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
         friend FilterBase<Scalar, RunningMax<Scalar, Options...>>;
 
@@ -60,7 +60,7 @@ namespace disiple {
                             >
     {
     public:
-        using State  = RunningRangeState<Scalar, RunningRange::channels>;
+        using State  = RunningRangeState<Scalar, RunningRange::ChannelsValue::Static>;
         using Coeffs = RunningMinMaxCoeffs<Scalar>;
         friend FilterBase<Scalar, RunningRange<Scalar, Options...>>;
 

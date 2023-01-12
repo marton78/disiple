@@ -17,8 +17,8 @@ namespace disiple {
                     >
     {
     public:
-        using State = FIRState<Scalar, FIR::length, FIR::channels>;
-        using Coeffs = FIRCoeffs<Scalar, FIR::length>;
+        using State = FIRState<Scalar, FIR::LengthValue::Static, FIR::ChannelsValue::Static>;
+        using Coeffs = FIRCoeffs<Scalar, FIR::LengthValue::Static>;
 
         FIR() {}
 
