@@ -1,54 +1,23 @@
 #pragma once
 
 #include <disiple/impl/fir_impl.hpp>
+#include <disiple/impl/maybe_static.hpp>
 #include <Eigen/Core>
 
 namespace disiple {
 
     template <typename Scalar, int Length, int Stages>
     struct MAvgCoeffs
+    : private MaybeStatic<Length, void>  // inheritance enables empty base-class optimization
+    , private MaybeStatic<Stages, char>
     {
         explicit MAvgCoeffs(int n = Length, int s = Stages)
-        { assert(n == Length && s == Stages); }
+        : MaybeStatic<Length, void>(n)
+        , MaybeStatic<Stages, char>(s)
+        {}
 
-        static int    length()  { return Length; }
-        static int    stages()  { return Stages; }
-    };
-
-    template <typename Scalar, int Stages>
-    struct MAvgCoeffs<Scalar, Eigen::Dynamic, Stages>
-    {
-        explicit MAvgCoeffs(int n = 0, int s = Stages)
-        : length_(n) { assert(s == Stages); }
-
-        int           length()  const { return length_; }
-        static int    stages()        { return Stages; }
-
-        int length_;
-    };
-
-    template <typename Scalar, int Length>
-    struct MAvgCoeffs<Scalar, Length, Eigen::Dynamic>
-    {
-        explicit MAvgCoeffs(int n = Length, int s = 0)
-        : stages_(s) { assert(n == Length); }
-
-        static int    length()        { return Length; }
-        int           stages()  const { return stages_; }
-
-        int stages_;
-    };
-
-    template <typename Scalar>
-    struct MAvgCoeffs<Scalar, Eigen::Dynamic, Eigen::Dynamic>
-    {
-        explicit MAvgCoeffs(int n = 0, int s = 0)
-        : length_(n), stages_(s) {}
-
-        int           length()  const { return length_; }
-        int           stages()  const { return stages_; }
-
-        int length_, stages_;
+        int length() const { return MaybeStatic<Length, void>::get(); }
+        int stages() const { return MaybeStatic<Stages, char>::get(); }
     };
 
     template <int A, int B>
